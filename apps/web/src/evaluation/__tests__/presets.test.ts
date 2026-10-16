@@ -118,6 +118,7 @@ describe("resolveChordSpec — unsupported combinations throw PresetError", () =
     ["shell", "maj"], ["shell", "m"], ["shell", "dim"], ["shell", "aug"],
     ["inversion_3", "maj"], ["inversion_3", "m"], ["inversion_3", "dim"], ["inversion_3", "aug"],
     ["rootless_a", "m7b5"], ["rootless_b", "m7b5"], ["rootless_a", "dim7"], ["rootless_b", "dim7"],
+    ["rootless_a", "7sus4"], ["rootless_b", "7sus4"], // theory-decisions #8
   ])("%s on %s", (p, q) => {
     expect(() => resolveChordSpec(C, q, p)).toThrow(PresetError);
   });

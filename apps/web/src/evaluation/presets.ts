@@ -72,7 +72,9 @@ export function resolveChordSpec(
     }
     case "rootless_a":
     case "rootless_b": {
-      if (quality === "m7b5" || quality === "dim7") {
+      // THEORY-DECISION: sus chords have their own rootless voicings (b7-9-11-13), not
+      // the 3-7-9 shape with 4 swapped in; unsupported until a lesson needs them. #8
+      if (quality === "m7b5" || quality === "dim7" || quality === "7sus4") {
         throw new PresetError(`${preset} on ${quality} needs an owner THEORY-DECISION; unsupported`);
       }
       const seventh = requireSeventh(quality, preset);
