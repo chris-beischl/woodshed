@@ -39,13 +39,18 @@ function watchContent(): Plugin {
 }
 
 export default defineConfig({
+  // Relative asset URLs: the build works under any GitHub Pages repo path.
+  base: "./",
   plugins: [
     { enforce: "pre", ...mdx(mdxOptions) },
     react({ include: /\.(mdx|tsx?)$/ }),
     tailwindcss(),
     watchContent(),
   ],
-  // Lessons live in /content at the repo root.
+  // Lessons live in /content at the repo root, outside this package's node_modules:
+  // resolve their React (JSX runtime) imports from here.
+  resolve: { dedupe: ["react", "react-dom"] },
   server: { fs: { allow: ["../.."] } },
-  test: { include: ["src/**/*.test.ts", "scripts/**/*.test.ts"] },
+  // Practice-day tests assume a fixed local time zone (with DST).
+  test: { include: ["src/**/*.test.ts", "scripts/**/*.test.ts"], env: { TZ: "Europe/Berlin" } },
 });

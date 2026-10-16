@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { useSaveSettings, useSettings, type Settings } from "../api/client";
+import { exportProgress, useImportProgress, useSaveSettings, useSettings, type Settings } from "../progress/client";
 import { useInput } from "../input/store";
 import { t } from "../ui/strings";
 
@@ -20,6 +20,7 @@ const input = "w-40 rounded-md border border-night-3 bg-night-2 px-3 py-1.5 tabu
 export function SettingsPage() {
   const settings = useSettings();
   const save = useSaveSettings();
+  const importProgress = useImportProgress();
   const { settleMs, setSettleMs } = useInput();
   const [draft, setDraft] = useState<Settings | null>(null);
   useEffect(() => {
@@ -55,9 +56,6 @@ export function SettingsPage() {
       <Field label={t.settings.retention} hint={t.settings.retentionHint}>
         <input type="number" min={0.7} max={0.99} step={0.01} value={draft.desired_retention} onChange={num("desired_retention")} className={input} />
       </Field>
-      <Field label={t.settings.timezone}>
-        <input value={draft.timezone} onChange={(e) => set("timezone", e.target.value)} className={`${input} w-56`} />
-      </Field>
       <Field label={t.settings.rollover} hint={t.settings.rolloverHint}>
         <input type="number" min={0} max={23} value={draft.day_rollover_hour} onChange={num("day_rollover_hour")} className={input} />
       </Field>
@@ -71,6 +69,33 @@ export function SettingsPage() {
         </button>
         {save.isSuccess && <span className="text-sage">{t.settings.saved}</span>}
         {save.isError && <span className="text-signal">{save.error.message}</span>}
+      </div>
+      {/* Not a <Field>: that is a <label>, and the file picker below is one too. */}
+      <div className="grid gap-1 border-t border-night-3 pt-8 sm:grid-cols-[16rem_minmax(0,1fr)] sm:items-baseline">
+        <span className="condensed text-lg font-bold">{t.settings.backup}</span>
+        <span className="space-y-2">
+        <span className="flex flex-wrap items-center gap-3">
+          <button type="button" onClick={exportProgress} className="rounded-full border border-paper/40 px-5 py-1.5 hover:border-paper">
+            {t.settings.exportProgress}
+          </button>
+          <label className="cursor-pointer rounded-full border border-paper/40 px-5 py-1.5 hover:border-paper focus-within:border-paper">
+            {t.settings.importProgress}
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file && confirm(t.settings.importConfirm)) importProgress.mutate(file);
+              }}
+            />
+          </label>
+          {importProgress.isSuccess && <span className="text-sage">{t.settings.imported}</span>}
+          {importProgress.isError && <span className="text-signal">{importProgress.error.message}</span>}
+        </span>
+        <span className="block text-sm text-paper-dim">{t.settings.backupHint}</span>
+        </span>
       </div>
     </form>
   );

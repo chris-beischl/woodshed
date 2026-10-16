@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { usePlan, usePostReview, type Plan } from "../api/client";
+import { usePlan, usePostReview, type Plan } from "../progress/client";
 import { useManifest } from "../content/useManifest";
 import { EXERCISE_COMPONENTS } from "../exercises/registry";
 import type { ExerciseOutcome } from "../exercises/types";
@@ -33,14 +33,14 @@ export function PracticePage() {
   const [index, setIndex] = useState(0);
   const [results, setResults] = useState<CardResult[]>([]);
   const [streak, setStreak] = useState(0);
-  const [pending, setPending] = useState<{ id: string; outcome: ExerciseOutcome } | null>(null);
+  const [pending, setPending] = useState<ExerciseOutcome | null>(null);
 
+  // Manifest first: the plan waits for it, so a manifest error would otherwise load forever.
+  if (manifest.isError) return <p className="text-signal">{manifest.error.message}</p>;
   if (plan.isPending || manifest.isPending) return <p className="text-paper-dim">{t.practice.loading}</p>;
   if (plan.isError) return <p className="text-signal">{t.practice.error}: {plan.error.message}</p>;
-  if (manifest.isError) return <p className="text-signal">{manifest.error.message}</p>;
 
   const items = plan.data.items;
-  const mismatch = plan.data.content_version !== manifest.data.version;
   if (items.length === 0) {
     return (
       <div className="max-w-xl space-y-6">
@@ -69,18 +69,10 @@ export function PracticePage() {
   const template = manifest.data.templates.find((tpl) => tpl.id === item.template_id);
   const Exercise = template && EXERCISE_COMPONENTS[template.type];
 
-  function save(id: string, outcome: ExerciseOutcome) {
-    setPending({ id, outcome });
+  function save(outcome: ExerciseOutcome) {
+    setPending(outcome);
     postReview.mutate(
-      {
-        id,
-        card_id: item.card_id,
-        rating: outcome.rating,
-        duration_ms: outcome.durationMs,
-        attempts: outcome.attempts,
-        details: outcome.details,
-        source: "review",
-      },
+      { card_id: item.card_id, rating: outcome.rating, duration_ms: outcome.durationMs, source: "review" },
       {
         onSuccess: () => {
           if (template) {
@@ -113,19 +105,16 @@ export function PracticePage() {
         {streak >= 2 && <span className="condensed rounded-full bg-sage px-3 py-0.5 font-bold text-night">{t.practice.streak(streak)}</span>}
       </div>
 
-      {mismatch && <p className="rounded-sm bg-brass/15 px-3 py-2 text-sm text-brass">{t.practice.contentMismatch}</p>}
-
       {template && <p className="condensed -mb-6 text-lg text-brass">{template.title}</p>}
       {Exercise && template ? (
         // key = card id: each card gets fresh exercise state.
-        <Exercise key={item.card_id} template={template} keyToken={item.key} onSubmit={(o) => save(crypto.randomUUID(), o)} />
+        <Exercise key={item.card_id} template={template} keyToken={item.key} onSubmit={save} />
       ) : (
         <p className="text-signal">Unknown template {item.template_id}</p>
       )}
 
       {postReview.isError && pending && (
-        // Retrying reuses the same review id, so the server applies it at most once.
-        <button className="rounded-full bg-signal px-4 py-2 font-bold text-night" onClick={() => save(pending.id, pending.outcome)}>
+        <button className="rounded-full bg-signal px-4 py-2 font-bold text-night" onClick={() => save(pending)}>
           {t.practice.saveError}
         </button>
       )}
@@ -138,7 +127,7 @@ function NextLesson({ lesson }: { lesson: NonNullable<Plan["next_lesson"]> }) {
     <div className="space-y-2 pt-4">
       <p className="condensed text-lg text-paper-dim">{t.practice.nextLesson}</p>
       <p className="condensed text-3xl font-bold">{lesson.title}</p>
-      <p className="text-paper-dim">{t.course.minutes(lesson.estimated_minutes)}</p>
+      <p className="text-paper-dim">{t.course.minutes(lesson.estimatedMinutes)}</p>
       <Link to={`/lektion/${lesson.id}`} className="inline-block rounded-full bg-brass px-6 py-2.5 font-bold text-night hover:bg-brass-deep">
         {t.practice.startLesson}
       </Link>

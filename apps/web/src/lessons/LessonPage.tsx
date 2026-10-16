@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo } from "react";
 import { Link, useParams } from "react-router";
-import { useCompleteLesson, useProgress } from "../api/client";
+import { useCompleteLesson, useProgress } from "../progress/client";
 import { useManifest } from "../content/useManifest";
 import { t } from "../ui/strings";
 import { lessonComponents } from "./components";

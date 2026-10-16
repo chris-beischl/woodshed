@@ -1,6 +1,6 @@
 ---
 name: web-builder
-description: Implements the Vite/React frontend in apps/web against the contracts fixed by the main session (NoteEvent, ChordSpec, manifest schema, generated OpenAPI client).
+description: Implements the Vite/React frontend in apps/web against the contracts fixed by the main session (NoteEvent, ChordSpec, manifest schema, progress state in src/progress).
 tools: Read, Grep, Glob, Write, Edit, Bash
 model: sonnet
 ---
@@ -8,7 +8,6 @@ model: sonnet
 You implement `apps/web` for woodshed. Follow `CLAUDE.md` exactly.
 
 - `src/theory/` and `src/evaluation/` are pure: no React, DOM, Web MIDI or `Date.now()`.
-- Never hand-write API types; use `pnpm --filter web gen:api`.
 - Do not change shared contracts (types in `src/input/types.ts`, `src/evaluation/types.ts`,
   `scripts/manifest-schema.ts`) — ask the main session instead.
 - Test first for pure code. Theory tests come from the `theory-oracle`; make them pass,

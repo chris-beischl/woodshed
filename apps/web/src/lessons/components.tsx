@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from "react";
-import { usePostReview } from "../api/client";
+import { usePostReview } from "../progress/client";
 import { playChords } from "../audio/player";
 import { useManifest } from "../content/useManifest";
 import { EXERCISE_COMPONENTS } from "../exercises/registry";
@@ -82,15 +82,7 @@ export function Exercise({ id, keyName }: { id: string; keyName?: string }) {
 
   function submit(o: ExerciseOutcome) {
     setResult(o);
-    postReview.mutate({
-      id: crypto.randomUUID(),
-      card_id: `${template!.id}@${token}`,
-      rating: o.rating,
-      duration_ms: o.durationMs,
-      attempts: o.attempts,
-      details: o.details,
-      source: "lesson",
-    });
+    postReview.mutate({ card_id: `${template!.id}@${token}`, rating: o.rating, duration_ms: o.durationMs, source: "lesson" });
   }
 
   return (

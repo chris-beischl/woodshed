@@ -19,18 +19,16 @@ exactly. `CLAUDE.md` defines *how* to work in the repo.
 │        ▲                                   ▼                     │
 │  exercises/ (type registry)  ◄── manifest.json (from content/)   │
 │  lessons/ (MDX)                            │                     │
-│                                            │ HTTP (JSON)         │
-└────────────────────────────────────────────┼─────────────────────┘
-                                             ▼
-┌──────────────────────────── FastAPI ────────────────────────────┐
-│  content/ (loads same manifest.json)                             │
-│  scheduling/ (py-fsrs)   planner/ (daily plan)                   │
-│  SQLite: cards, review_logs, lesson_progress, settings           │
+│                                            ▼                     │
+│  progress/ ── ts-fsrs scheduling, daily planner, learner state   │
+│        │                                                         │
+│        ▼                                                         │
+│  localStorage  ◄──►  JSON backup file (export / import)          │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-Single user. Auth is a static bearer token from an env var (`WOODSHED_TOKEN`); good
-enough for a personal deployment, revisit if that changes.
+A static site (GitHub Pages): no server, no accounts. Each browser holds one learner's
+progress; moving between devices goes through the backup file.
 
 ---
 
@@ -365,12 +363,9 @@ roman numeral parsing in every key), and writes `manifest.json`:
 }
 ```
 
-The backend loads the same file at startup (path from env) and validates it with
-pydantic. The pydantic model covers **only the fields the backend uses** (template id,
-mode, importance, estimatedSeconds, keys, deprecated; lesson id, order, introduces,
-estimatedMinutes) with `extra="ignore"`, so the full Zod schema is not mirrored by hand.
-The web build also writes `manifest.schema.json` via Zod 4's `z.toJSONSchema()` for
-reference. A backend test validates the real manifest.
+The app fetches it at startup (relative to `import.meta.env.BASE_URL`) and parses it
+with the same Zod schema. The build also writes `manifest.schema.json` via Zod 4's
+`z.toJSONSchema()` for reference.
 
 ### 5.5 Lines: scales and licks (`play_line`)
 
@@ -450,16 +445,15 @@ optionally `hidden: true` to retire a lesson without deleting its ID.
 
 ---
 
-## 7. Daily planner (server)
+## 7. Daily planner (`src/progress/planner.ts`, pure)
 
 Input: `settings.dailyMinutes`, `settings.newCardRatio` (default 0.2),
-`settings.desiredRetention` (default 0.9), `settings.timezone` (IANA, default
-`Europe/Berlin`), `settings.dayRolloverHour` (default 4).
+`settings.desiredRetention` (default 0.9), `settings.dayRolloverHour` (default 4).
 
-**Practice day**: runs from `dayRolloverHour` local time to the next day's
+**Practice day**: runs from `dayRolloverHour` in the browser's local time zone to the next day's
 `dayRolloverHour`. `day_end` = end of the current practice day.
 
-**Remaining budget** = `dailyMinutes` − sum of `duration_ms` of today's `review_logs`
+**Remaining budget** = `dailyMinutes` − sum of `duration_ms` of today's review logs
 (source `review`). Reloading the page mid-session therefore never refills the budget.
 
 1. **Due reviews**: cards with `due <= day_end`, not suspended, template not deprecated.
@@ -475,7 +469,7 @@ Input: `settings.dailyMinutes`, `settings.newCardRatio` (default 0.2),
    **Daily cap**: at most `settings.newCardsPerDay` (default 10) new cards per practice
    day, counting cards whose first review happened today.
 3. **Time estimate per card**: EMA of measured durations for that template (from
-   `review_logs`), falling back to `estimatedSeconds`.
+   review logs), falling back to `estimatedSeconds`.
 4. Fill budget: reviews up to `(1 − newCardRatio) × budget`, new cards up to
    `newCardRatio × budget`; unused capacity in either bucket flows to the other.
 5. **Ordering within the session**: interleave — avoid the same template twice in a
@@ -488,52 +482,50 @@ The plan is computed at session start and returned as an ordered list of card ID
 
 ---
 
-## 8. Backend
+## 8. Learner state (`src/progress/`)
 
-### 8.1 Tables
+### 8.1 Shape
+
+One JSON document in localStorage (`woodshed.progress.v1`), validated by
+`learnerSchema` (Zod) on every load and on import:
 
 ```
-cards          id (pk, text), template_id, key, variant, fsrs_state (json, NULL while new),
-               due (datetime, indexed), introduced_at, suspended (bool)
-review_logs    id (client-generated uuid, idempotent POST), card_id (indexed), ts, rating,
-               duration_ms, attempts, source ("review"|"lesson"), content_version,
-               details (json: ChordMatchResults, chosen option, pedal usage, ...)
-lesson_progress lesson_id (pk), completed_at
-settings       single row: daily_minutes, new_card_ratio, desired_retention,
-               timezone, day_rollover_hour, new_cards_per_day, keys_in_progress
+version            1 (bump + convert on load when the shape changes)
+cards              { [card_id]: template_id, key, fsrs (ts-fsrs Card, null while new),
+                     suspended, introduced_at }
+logs               [ ts, card_id, rating, duration_ms, source ("review"|"lesson") ]
+completed_lessons  [ lesson_id ]  (completion order)
+settings           daily_minutes, new_card_ratio, desired_retention,
+                   day_rollover_hour, new_cards_per_day, keys_in_progress
 ```
 
-`content_version` is the manifest hash at review time, so analytics stay
-interpretable after content changes.
+Logs keep only what the planner reads; attempt `details` are not stored, so years of
+reviews fit in localStorage's ~5 MB. Error analytics would need IndexedDB.
 
-`details` must be stored completely — it enables later error analytics
-("confuses b7/maj7 in sharp keys").
+Invalid stored data raises an error instead of being replaced. Settings → "Fortschritt
+sichern" exports the document as a file and imports one (validated before it overwrites
+anything).
 
-### 8.2 API
+### 8.2 Operations
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/health` | |
-| GET | `/plan` | today's session plan |
-| POST | `/reviews` | `{id, card_id, rating, duration_ms, attempts, details, source}` → updates FSRS (if source=review), returns new due. Re-posting the same `id` is a no-op returning the original result |
-| GET | `/cards` | filter by template / key / state |
-| PATCH | `/cards/{id}` | suspend / unsuspend |
-| POST | `/lessons/{id}/complete` | activates cards |
-| GET | `/progress` | completed lessons, card counts per state, per-key stats |
-| GET / PUT | `/settings` | |
+Pure functions in `state.ts` (`now` passed in); `client.ts` wraps them in TanStack Query
+hooks that load, apply and save:
 
-FastAPI generates OpenAPI; the frontend client is generated from it
-(`openapi-typescript`). Never hand-write API types on the frontend.
+| Operation | Effect |
+|---|---|
+| `planFor` | today's session plan (§ 7) |
+| `applyReview` | appends a log; for source `review` on an existing card, updates FSRS |
+| `completeLesson` | marks the lesson done, creates a `new` card per introduced template × key |
+| settings | read / replace |
 
 ### 8.3 FSRS
 
-Use `py-fsrs` (package `fsrs`, version pinned in `pyproject.toml`) with default
-parameters and `desired_retention` from settings. Parameter optimization from logs is a
-later milestone (needs several hundred reviews).
+Use `ts-fsrs` with default parameters (the same FSRS-6 weights `py-fsrs` used), fuzzing
+on, and `desired_retention` from settings. Parameter optimization from logs is a later
+milestone (needs several hundred reviews).
 
-Current py-fsrs has **no `New` state** (cards start in `Learning`). "New" is an app
-state: `fsrs_state IS NULL`. The first review creates the FSRS card. Card state as
-exposed by the API = `new | learning | review | relearning`.
+"New" is an app state: `fsrs` is null. The first review creates the FSRS card. Card
+state = `new | learning | review | relearning`.
 
 ---
 
@@ -550,9 +542,10 @@ exposed by the API = `new | learning | review | relearning`.
     `allowDoubling = false` or a span/order constraint is hit.
 - **Chord capture**: synthetic event sequences with realistic timing jitter, legato
   voice leading with held common tones, and recorded fixtures from the real piano.
-- **Backend**: planner with frozen time, budget edge cases (no due cards, only new
-  cards, overflow, budget already partly spent today, day rollover), manifest
-  validation, review → FSRS state transition, idempotent review POST.
+- **Progress**: planner with frozen time and a pinned time zone (`TZ=Europe/Berlin`
+  in `vite.config.ts`): budget edge cases (no due cards, only new cards, overflow,
+  budget already partly spent today, day rollover, DST), review → FSRS state
+  transition, JSON round trip of the learner state.
 
 ---
 
@@ -575,7 +568,7 @@ Split into three slices, each ending with `pnpm check` green.
   the correct answer after the attempt.
 - Dev panel for capture thresholds. Owner can tune them on the real piano here.
 
-**M1c — Backend & practice loop**
+**M1c — Backend & practice loop** (the FastAPI backend was later replaced by `src/progress/`, § 8)
 - Backend: manifest loading, cards, reviews, FSRS, `/plan` (§ 7, except the
   next-lesson suggestion), settings.
 - `POST /lessons/{id}/complete` (API only, UI in M2) so cards can be created; a
@@ -614,7 +607,7 @@ The course itself is planned in `docs/curriculum.md`; milestones follow its unit
 
 ### M4 — Chromatic harmony & insight (unit 6)
 - Secondary-dominant grammar `V:7/ii`.
-- Error analytics from `review_logs.details` (per key, per degree).
+- Error analytics per key and degree (needs attempt details stored again, in IndexedDB; § 8.1).
 - FSRS parameter optimization.
 
 ### Later
@@ -624,9 +617,7 @@ The course itself is planned in `docs/curriculum.md`; milestones follow its unit
 
 ## 11. Open decisions
 
-- Hosting/deployment target (affects token handling and HTTPS — Web MIDI requires a
-  secure context; `localhost` is fine for development).
-- Practice device: Safari (incl. iPad) has no Web MIDI. If a tablet at the piano is
-  wanted, that needs a native wrapper or a different browser — decide before M2.
+- Practice device: Safari (incl. iPad) has no Web MIDI. Decided for now: on iPad use a
+  third-party Web MIDI browser app; a native wrapper only if that proves unreliable.
 - Lesson language: German default, confirm before writing the course.
 - Whether in-lesson attempts should seed the first FSRS review.

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { useProgress } from "../api/client";
+import { useProgress } from "../progress/client";
 import { useManifest } from "../content/useManifest";
 import { t } from "../ui/strings";
 
