@@ -161,10 +161,11 @@ Progressions in templates are written key-relative so they transpose:
 Root spelling: tonic letter + numeral letter offset, accidental chosen to match the
 major-scale degree ± modifier. Then chord tones are spelled from that root via § 3.3.
 
-**Root respelling** (`THEORY-DECISION`): if the resulting *root* needs a double
-accidental, respell it to the enharmonic root with the fewest accidentals, preferring
+**Root respelling** (`THEORY-DECISION`): if a *chromatic* root (numeral with `b`/`#`)
+needs a double accidental, respell it to the enharmonic root with the fewest accidentals, preferring
 flats on a tie. Lead sheets write G7, not Abb7, for `bII:7` in Gb (likewise D7 in Db).
-Chord *tones* keep strict letter arithmetic (Cdim7 still contains Bbb).
+Diatonic roots are never respelled (`vii:dim7` in G# minor is F##dim7). Chord *tones*
+keep strict letter arithmetic (Cdim7 still contains Bbb).
 
 **Build-time range check**: the manifest build spells every chord tone of every
 template × key and fails if any accidental is outside `-2..2`.
@@ -269,7 +270,9 @@ tuned on the real piano. Arpeggiated chords are out of scope until a lesson need
 
 For a sequence of ChordSpecs: evaluate each settled chord against the *current*
 expected chord. Match → advance. Committed mismatch (§ 4.4) → record an error for
-this chord, stay on it. Configurable `maxAttemptsPerChord` (default 3) after which the chord is
+this chord, stay on it. A commit only counts if the same note set *settled* while the
+current chord was expected — releasing the chord just accepted must not count as a
+mistake on the next one. Configurable `maxAttemptsPerChord` (default 3) after which the chord is
 marked failed and the runner advances. Timing against a metronome is a later
 milestone; until then only order matters.
 

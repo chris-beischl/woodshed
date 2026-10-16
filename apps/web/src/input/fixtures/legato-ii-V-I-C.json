@@ -1,0 +1,14 @@
+[
+  { "type": "noteOn", "midi": 62, "velocity": 70, "t": 1000 },
+  { "type": "noteOn", "midi": 65, "velocity": 72, "t": 1018 },
+  { "type": "noteOn", "midi": 69, "velocity": 68, "t": 1031 },
+  { "type": "noteOn", "midi": 72, "velocity": 66, "t": 1044 },
+  { "type": "sustain", "on": true, "t": 1500 },
+  { "type": "noteOff", "midi": 62, "t": 2000 },
+  { "type": "noteOff", "midi": 69, "t": 2004 },
+  { "type": "noteOn", "midi": 67, "velocity": 70, "t": 2010 },
+  { "type": "noteOn", "midi": 71, "velocity": 70, "t": 2031 },
+  { "type": "noteOff", "midi": 72, "t": 2035 },
+  { "type": "noteOn", "midi": 74, "velocity": 70, "t": 2050 },
+  { "type": "sustain", "on": false, "t": 2600 }
+]

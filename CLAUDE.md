@@ -41,6 +41,7 @@ Core loop:
 
 Do not add dependencies outside this list without stating why in the PR/commit message.
 JSON Schema export uses Zod 4's built-in `z.toJSONSchema()` — no extra library.
+TypeScript is pinned to 6.x: TS 7 (native) has no JS compiler API, which `openapi-typescript` needs.
 
 Supported browsers: Chromium-based and Firefox (Web MIDI). Safari/iPad has no Web MIDI.
 

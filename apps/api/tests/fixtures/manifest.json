@@ -1,0 +1,23 @@
+{
+  "version": "test-version-1",
+  "templates": [
+    {"id": "triads-major", "type": "play_chord", "title": "Major triads", "mode": "major", "importance": 5,
+     "targetSeconds": 8, "estimatedSeconds": 10,
+     "keys": ["C","F","Bb","Eb","Ab","Db","Gb","B","E","A","D","G"],
+     "deprecated": false, "tags": [], "prompt": {}, "response": {}, "params": {}},
+    {"id": "triads-minor", "type": "play_chord", "title": "Minor triads", "mode": "minor", "importance": 4,
+     "targetSeconds": 8, "estimatedSeconds": 10,
+     "keys": ["C","F","Bb","Eb","Ab","Db","Gb","B","E","A","D","G"],
+     "deprecated": false, "tags": []},
+    {"id": "old-thing", "type": "play_chord", "title": "Old", "mode": "major", "importance": 3,
+     "targetSeconds": 8, "estimatedSeconds": 10, "keys": ["C","F"], "deprecated": true, "tags": []},
+    {"id": "orphan", "type": "play_chord", "title": "No lesson", "mode": "major", "importance": 2,
+     "targetSeconds": 8, "estimatedSeconds": 10, "keys": ["C","F"], "deprecated": false, "tags": []}
+  ],
+  "lessons": [
+    {"id": "triads-intro", "order": 1, "title": "Triads", "estimatedMinutes": 15,
+     "introduces": ["triads-major"], "prerequisites": []},
+    {"id": "minor-intro", "order": 2, "title": "Minor", "estimatedMinutes": 10,
+     "introduces": ["triads-minor", "old-thing", "orphan"], "prerequisites": ["triads-intro"]}
+  ]
+}

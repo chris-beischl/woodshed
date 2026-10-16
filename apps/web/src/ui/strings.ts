@@ -1,0 +1,53 @@
+import type { Rating } from "../evaluation/types";
+
+/** All UI text in one place (German by default; jazz terms stay English). */
+export const t = {
+  appName: "woodshed",
+  nav: { practice: "Üben", dev: "Entwicklung" },
+  input: {
+    connectMidi: "MIDI verbinden",
+    noWebMidi: "Dieser Browser unterstützt kein Web MIDI (Chrome, Edge oder Firefox verwenden).",
+    noDevices: "Kein MIDI-Gerät gefunden.",
+    device: "Gerät",
+    sustain: "Pedal",
+    virtualHint: "Tastatur: A W S E D F T G Z/Y H U J K (C4–C5) · Klick hält/löst eine Taste",
+  },
+  exercise: {
+    play: "Spiele",
+    in: "in",
+    giveUp: "Aufgeben",
+    correct: "Richtig!",
+    failed: "Nicht geschafft",
+    answer: "Lösung",
+    mistakes: (n: number) => (n === 1 ? "1 Fehler" : `${n} Fehler`),
+    missing: "Fehlt",
+    forbidden: "Nicht erlaubt",
+    unexpected: "Unerwartete Töne",
+    bassWrong: "Falscher Basston",
+    rating: "Bewertung",
+    next: "Weiter",
+  },
+  ratings: { again: "Nochmal", hard: "Schwer", good: "Gut", easy: "Leicht" } satisfies Record<Rating, string>,
+  practice: {
+    loading: "Lade Tagesplan …",
+    error: "Server nicht erreichbar",
+    empty: "Heute ist nichts fällig.",
+    done: "Fertig für heute!",
+    progress: (i: number, n: number) => `Karte ${i} von ${n}`,
+    overflow: (n: number) => `${n} weitere fällige Karten passen heute nicht ins Zeitbudget.`,
+    completeSampleLesson: "Beispiel-Lektion abschließen (Karten anlegen)",
+    contentMismatch: "Inhalte haben sich geändert – Seite neu laden.",
+    saveError: "Speichern fehlgeschlagen – erneut versuchen",
+  },
+  dev: {
+    title: "Entwicklung",
+    settle: "Settle-Zeit (ms)",
+    record: "Aufnahme starten",
+    stopRecord: "Aufnahme stoppen & speichern",
+    replay: "Fixture abspielen (JSON)",
+    freePlay: "Freies Üben",
+    template: "Übung",
+    key: "Tonart",
+    events: "Capture-Ereignisse",
+  },
+};

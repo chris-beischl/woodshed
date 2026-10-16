@@ -1,0 +1,14 @@
+id: triads-minor
+type: play_chord
+title: "Moll-Dreiklänge"
+tags: [triads, minor]
+importance: 4
+targetSeconds: 6
+estimatedSeconds: 12
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "i:m"
+voicing: any
+deprecated: false
