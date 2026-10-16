@@ -372,6 +372,45 @@ estimatedMinutes) with `extra="ignore"`, so the full Zod schema is not mirrored 
 The web build also writes `manifest.schema.json` via Zod 4's `z.toJSONSchema()` for
 reference. A backend test validates the real manifest.
 
+### 5.5 Licks (`play_lick`)
+
+A lick is a short monophonic line, written **relative to a reference root** with degree
+tokens (§ 3.3) so it spells correctly and transposes to every key:
+
+```yaml
+id: lick-enclosure-3
+type: play_lick
+title: "Enclosure auf die Terz"
+mode: major
+keys: all
+prompt: { kind: notation }      # staff + chord symbol; "audio" = call & response (M2b)
+response: { kind: play }
+over: ["I:maj7"]                # chord(s) the lick sits on (display, later LH check)
+ref: chord                      # degrees relative to the first chord's root, or "key" (tonic)
+notes: ["4", "#9", "3"]         # F – D# – E over Cmaj7
+contour: [-1, 1]                # direction of each step between consecutive notes, see below
+tempo: { start: 80, step: 8 }   # tempo ladder in bpm (M3 enforces timing)
+```
+
+- **Spelling**: each note = `spellDegree(refRoot, token)`; letter arithmetic, never pitch
+  class (D# in the enclosure above, not Eb). Multi-chord licks use `ref: key` so tokens
+  are relative to the tonic.
+- **Register**: `contour[i]` is −1/0/+1 = the next note is the nearest pitch *below* /
+  either / *above* the previous one (0 = nearest, ties go up). This fixes the shape
+  without fixing the octave. The first note may be in any octave.
+- **Evaluation** (pure, in `src/evaluation/lick.ts`): note-ons are compared to the
+  expected MIDI sequence anchored on the first note played. A wrong note = one mistake
+  and the take restarts from the first note; `maxAttempts` (default 3) failed takes =
+  failed. Note-offs, velocity and sustain are ignored. Until M3, only order counts;
+  `targetSeconds` grades speed. In M3, timing is checked against the tempo with a
+  tolerance window.
+- **Grading**: § 4.6 with the lick as a single "chord".
+- **Two hands (M3)**: `leftHand: { voicing: shell }` additionally requires the `over`
+  chord to be held below a split point (default C4) while the lick is played above it.
+
+Build-time validation: every token spells within `-2..2` in every key, `contour` has
+`notes.length − 1` entries.
+
 ---
 
 ## 6. Lessons (MDX)
@@ -534,22 +573,36 @@ Split into three slices, each ending with `pnpm check` green.
 `play_chord` cards across several keys; reviews are persisted; the next day's plan
 reflects them. `pnpm check` passes.
 
-### M2 — Progressions & lessons
+The course itself is planned in `docs/curriculum.md`; milestones follow its units.
+
+### M2a — Lessons & progressions (curriculum units 1–2)
+- Lesson pages with MDX components, lesson completion UI, course overview.
 - Progression runner, `play_progression`, `guide_tones`, `rootless_a/b`.
-- `choice_notation`, `name_chord` exercise types.
-- Lesson pages with MDX components, lesson completion, course overview.
+- `choice` exercise type (scale degrees, `name_chord`, `choice_notation`).
+- Planner: daily new-card cap and gradual key unlock (new keys of a template only after
+  the earlier ones have left `learning`).
+- Tone.js playback: hear chords and resolutions in lessons and after an attempt.
 - Settings UI.
 
-### M3 — Insight & polish
+### M2b — Licks (curriculum lick track, unit 3)
+- `play_lick` (§ 5.5) with call & response (`audio` prompt), tempo ladder.
+- Circle-of-keys mastery view per template.
+- Shell variants `shell_137` / `shell_173`.
+
+### M3 — Groove & two hands (units 3–5)
+- Backing grooves (bass + drums) and metronome; timing evaluation for progressions and
+  licks.
+- Hand split: LH chord + RH line in one exercise.
+- Extension qualities (maj9, m9, 9, 13, 7b9, 7alt), quartal voicings, upper structures.
+- Tune exercises (changes in a fixed key over a groove).
+
+### M4 — Chromatic harmony & insight (unit 6)
+- Secondary-dominant grammar `V:7/ii`.
 - Error analytics from `review_logs.details` (per key, per degree).
-- Tone.js playback, `audio` prompt kind (ear training).
-- Metronome + timing evaluation for progressions.
 - FSRS parameter optimization.
 
 ### Later
 - `AudioInputSource` (Basic Pitch) for the acoustic piano without MIDI.
-- Melody/scale exercises, left/right hand split constraints.
-- The actual course content (designed separately with the owner).
 
 ---
 

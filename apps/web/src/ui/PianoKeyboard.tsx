@@ -51,16 +51,16 @@ export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: numb
 
   return (
     <div className="select-none">
-      <div className="relative h-28 w-full">
+      <div className="relative h-32 w-full overflow-hidden rounded-b-md border-t-4 border-signal/80 bg-ebony">
         {whites.map((m, i) => (
           <button
             key={m}
             aria-label={`MIDI ${m}`}
             onClick={() => toggle(m)}
-            className={`absolute top-0 h-full rounded-b border border-stone-400 ${held.includes(m) ? "bg-amber-400" : "bg-white"}`}
+            className={`absolute top-0 h-full rounded-b-[3px] border-x border-b border-ebony/40 transition-colors duration-75 ${held.includes(m) ? "bg-brass" : "bg-ivory hover:bg-paper"}`}
             style={{ left: `${i * whiteWidth}%`, width: `${whiteWidth}%` }}
           >
-            {m % 12 === 0 && <span className="absolute bottom-1 left-0 right-0 text-[10px] text-stone-500">C{m / 12 - 1}</span>}
+            {m % 12 === 0 && <span className="condensed absolute bottom-1.5 left-0 right-0 text-[11px] text-ebony/50">C{m / 12 - 1}</span>}
           </button>
         ))}
         {keys
@@ -72,15 +72,15 @@ export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: numb
                 key={m}
                 aria-label={`MIDI ${m}`}
                 onClick={() => toggle(m)}
-                className={`absolute top-0 z-10 h-[62%] rounded-b ${held.includes(m) ? "bg-amber-500" : "bg-stone-900"}`}
+                className={`absolute top-0 z-10 h-[62%] rounded-b-[3px] shadow-[inset_0_-4px_0_rgba(255,255,255,0.08)] transition-colors duration-75 ${held.includes(m) ? "bg-brass-deep" : "bg-ebony"}`}
                 style={{ left: `${leftWhites * whiteWidth - whiteWidth * 0.3}%`, width: `${whiteWidth * 0.6}%` }}
               />
             );
           })}
       </div>
-      <div className="mt-1 flex justify-between text-xs text-stone-500">
+      <div className="mt-2 flex justify-between gap-4 text-xs text-paper-dim">
         <span>{t.input.virtualHint}</span>
-        <span className={sustain ? "font-semibold text-amber-600" : ""}>{t.input.sustain}: {sustain ? "●" : "○"}</span>
+        <span className={`shrink-0 ${sustain ? "font-bold text-brass" : ""}`}>{t.input.sustain} {sustain ? "●" : "○"}</span>
       </div>
     </div>
   );

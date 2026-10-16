@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
 import { formatNote, letterIndex, type SpelledNote } from "../theory/note";
+import { displayNote } from "../ui/music";
 
 const VF_ACCIDENTAL = { [-2]: "bb", [-1]: "b", 0: "", 1: "#", 2: "##" } as const;
 
@@ -25,8 +26,9 @@ export function ChordNotation({ tones, label }: { tones: SpelledNote[]; label?: 
     if (!el) return;
     el.innerHTML = "";
     const renderer = new Renderer(el, Renderer.Backends.SVG);
-    renderer.resize(220, 150);
+    renderer.resize(286, 170);
     const ctx = renderer.getContext();
+    ctx.scale(1.3, 1.3);
     const stave = new Stave(10, 20, 200).addClef("treble");
     stave.setContext(ctx).draw();
 
@@ -42,7 +44,11 @@ export function ChordNotation({ tones, label }: { tones: SpelledNote[]; label?: 
   return (
     <figure className="inline-block">
       <div ref={ref} aria-label={tones.map(formatNote).join(" ")} />
-      {label && <figcaption className="text-center text-sm text-stone-600">{label}: {tones.map(formatNote).join(" – ")}</figcaption>}
+      {label && (
+        <figcaption className="condensed text-center text-base">
+          {label}: <strong>{tones.map(displayNote).join("  ")}</strong>
+        </figcaption>
+      )}
     </figure>
   );
 }

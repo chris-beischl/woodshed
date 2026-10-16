@@ -5,6 +5,8 @@ export interface ExerciseOutcome {
   rating: Rating;
   durationMs: number;
   attempts: number;
+  /** Correct on the first try, not abandoned — feeds the session streak. */
+  clean: boolean;
   details: Record<string, unknown>;
 }
 

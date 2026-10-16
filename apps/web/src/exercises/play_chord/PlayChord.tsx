@@ -5,7 +5,9 @@ import { requiredCount } from "../../evaluation/match";
 import { createProgressionRunner, type RunnerState } from "../../evaluation/runner";
 import type { Rating } from "../../evaluation/types";
 import { subscribeAll, useInput } from "../../input/store";
-import { formatKey, parseKeyToken } from "../../theory/keys";
+import { parseKeyToken } from "../../theory/keys";
+import { ChordSymbol, NumeralSymbol } from "../../ui/ChordSymbol";
+import { displayDegree, displayKey } from "../../ui/music";
 import { t } from "../../ui/strings";
 import { playChordParams } from "../schema";
 import type { ExerciseProps } from "../types";
@@ -75,6 +77,7 @@ export function PlayChord({ template, keyToken, onSubmit }: ExerciseProps) {
       rating: override ?? computed,
       durationMs: Math.round(durationMs),
       attempts: (chord?.mistakes ?? 0) + (chord?.correct ? 1 : 0),
+      clean: !abandoned && (chord?.correct ?? false) && (chord?.mistakes ?? 0) === 0,
       details: {
         type: "play_chord",
         key: keyToken,
@@ -89,64 +92,90 @@ export function PlayChord({ template, keyToken, onSubmit }: ExerciseProps) {
     });
   }
 
+  const tone = done ? (chord?.correct ? "correct" : "wrong") : lastResult && !lastResult.correct ? "wrong" : "idle";
+  const mistakes = chord?.mistakes ?? 0;
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-stone-500">{t.exercise.play}</p>
-        <p className="text-5xl font-semibold tracking-tight">
-          {template.prompt.kind === "roman" ? instance.roman : instance.symbol}
-        </p>
-        {template.prompt.kind === "roman" && <p className="mt-1 text-xl text-stone-600">{t.exercise.in} {formatKey(key)}</p>}
-        {(chord?.mistakes ?? 0) > 0 && !done && <p className="mt-2 text-red-600">{t.exercise.mistakes(chord!.mistakes)}</p>}
+    <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+      <div>
+        <p className="condensed text-xl text-paper-dim">{t.exercise.play}</p>
+        <div key={done ? "done" : "open"} className={done && chord?.correct ? "stamp origin-left" : ""}>
+          {template.prompt.kind === "roman" ? (
+            <div className="flex flex-wrap items-end gap-x-8">
+              <NumeralSymbol numeral={instance.numeral} quality={instance.spec.quality} tone={tone} className="text-[clamp(7rem,24vw,15rem)]" />
+              <span className="condensed pb-[0.15em] text-[clamp(2.5rem,7vw,4.5rem)] leading-none font-bold">
+                {t.exercise.in} {displayKey(key)}
+              </span>
+            </div>
+          ) : (
+            <ChordSymbol root={instance.spec.root} quality={instance.spec.quality} tone={tone} className="text-[clamp(7rem,24vw,15rem)]" />
+          )}
+        </div>
+
+        <div className="mt-4 flex min-h-8 items-center gap-4" aria-live="polite">
+          <span className="flex gap-1.5" aria-label={t.exercise.mistakes(mistakes)}>
+            {[0, 1, 2].map((i) => (
+              <span key={i} className={`h-3 w-3 rounded-full border-2 ${i < mistakes ? "border-signal bg-signal" : "border-paper-dim/50"}`} />
+            ))}
+          </span>
+          {lastResult && !lastResult.correct && !done && (
+            <span className="text-signal">
+              {[
+                lastResult.missing.length > 0 && `${t.exercise.missing}: ${lastResult.missing.map(displayDegree).join(", ")}`,
+                lastResult.forbidden.length > 0 && `${t.exercise.forbidden}: ${lastResult.forbidden.map(displayDegree).join(", ")}`,
+                lastResult.unexpected.length > 0 && `${t.exercise.unexpected}: ${lastResult.unexpected.length}`,
+                lastResult.violations.includes("bass") && t.exercise.bassWrong,
+              ]
+                .filter(Boolean)
+                .join(" — ")}
+            </span>
+          )}
+          {done && (
+            <span className={`condensed text-2xl font-bold ${chord?.correct ? "text-sage" : "text-signal"}`}>
+              {chord?.correct ? (mistakes === 0 ? t.exercise.correct : t.exercise.correctAfter(mistakes)) : t.exercise.failed}
+            </span>
+          )}
+        </div>
       </div>
 
-      {lastResult && !lastResult.correct && (
-        <div className="mx-auto max-w-md rounded bg-red-50 p-3 text-sm text-red-800">
-          {lastResult.missing.length > 0 && <p>{t.exercise.missing}: {lastResult.missing.join(", ")}</p>}
-          {lastResult.forbidden.length > 0 && <p>{t.exercise.forbidden}: {lastResult.forbidden.join(", ")}</p>}
-          {lastResult.unexpected.length > 0 && <p>{t.exercise.unexpected}: {lastResult.unexpected.length}</p>}
-          {lastResult.violations.includes("bass") && <p>{t.exercise.bassWrong}</p>}
-        </div>
-      )}
-
       {done && computed && (
-        <div className="space-y-4 text-center">
-          <p className={`text-2xl font-semibold ${chord?.correct ? "text-green-700" : "text-red-700"}`}>
-            {chord?.correct ? t.exercise.correct : t.exercise.failed}
-          </p>
-          <Suspense fallback={<div className="h-[150px]" />}>
-            <ChordNotation tones={instance.tones} label={`${t.exercise.answer} ${instance.symbol}`} />
-          </Suspense>
-          <div>
-            <p className="mb-2 text-sm text-stone-500">{t.exercise.rating}</p>
-            <div className="flex justify-center gap-2">
+        <div className="flex flex-col gap-5 md:items-end">
+          <div className="rounded-sm bg-paper px-4 pt-2 pb-3 text-night shadow-[6px_6px_0_var(--color-brass)]">
+            <Suspense fallback={<div className="h-[170px] w-[286px]" />}>
+              <ChordNotation tones={instance.tones} label={t.exercise.answer} />
+            </Suspense>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <div role="radiogroup" aria-label={t.exercise.rating} className="flex overflow-hidden rounded-full border border-night-3">
               {(["again", "hard", "good", "easy"] as const).map((r) => (
                 <button
                   key={r}
+                  role="radio"
+                  aria-checked={(override ?? computed) === r}
                   onClick={() => setOverride(r)}
-                  className={`rounded px-3 py-1 ${(override ?? computed) === r ? "bg-stone-800 text-white" : "bg-stone-200"}`}
+                  className={`px-4 py-2 text-sm transition-colors ${(override ?? computed) === r ? "bg-paper text-night" : "text-paper-dim hover:text-paper"}`}
                 >
                   {t.ratings[r]}
                 </button>
               ))}
             </div>
+            <button onClick={submit} autoFocus className="rounded-full bg-brass px-7 py-2.5 font-bold text-night hover:bg-brass-deep">
+              {t.exercise.next}
+            </button>
           </div>
-          <button onClick={submit} className="rounded bg-amber-500 px-6 py-2 font-semibold text-white" autoFocus>
-            {t.exercise.next}
-          </button>
         </div>
       )}
 
       {!done && (
-        <div className="text-center">
-          <button
-            onClick={() => {
-              finishedAt.current = performance.now();
-              setAbandoned(true);
-            }} className="text-sm text-stone-500 underline">
-            {t.exercise.giveUp}
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            finishedAt.current = performance.now();
+            setAbandoned(true);
+          }}
+          className="justify-self-start text-sm text-paper-dim underline underline-offset-4 hover:text-paper md:justify-self-end"
+        >
+          {t.exercise.giveUp}
+        </button>
       )}
     </div>
   );

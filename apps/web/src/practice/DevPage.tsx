@@ -5,6 +5,8 @@ import { EXERCISE_COMPONENTS } from "../exercises/registry";
 import { createRecorder } from "../input/sources";
 import { replaySource, subscribeAll, useInput } from "../input/store";
 import type { NoteEvent } from "../input/types";
+import { parseKeyToken } from "../theory/keys";
+import { displayKey } from "../ui/music";
 import { t } from "../ui/strings";
 
 /** Capture tuning, recorder/replay and free play without touching the schedule. */
@@ -60,25 +62,25 @@ export function DevPage() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold">{t.dev.title}</h2>
+      <h1 className="display text-6xl">{t.dev.title}</h1>
       <label className="block">
         {t.dev.settle}: <strong>{settleMs}</strong>
-        <input type="range" min={30} max={400} step={10} value={settleMs} onChange={(e) => setSettleMs(Number(e.target.value))} className="ml-3 align-middle" />
+        <input type="range" min={30} max={400} step={10} value={settleMs} onChange={(e) => setSettleMs(Number(e.target.value))} className="ml-3 align-middle accent-brass" />
       </label>
 
       <div className="flex gap-3">
-        <button className="rounded bg-stone-200 px-3 py-1" onClick={toggleRecording}>
+        <button className="rounded-full border border-night-3 bg-night-2 px-4 py-1.5 hover:border-paper-dim cursor-pointer" onClick={toggleRecording}>
           {recording ? t.dev.stopRecord : t.dev.record}
         </button>
-        <label className="rounded bg-stone-200 px-3 py-1">
+        <label className="rounded-full border border-night-3 bg-night-2 px-4 py-1.5 hover:border-paper-dim cursor-pointer">
           {t.dev.replay}
           <input type="file" accept="application/json" className="hidden" onChange={(e) => e.target.files?.[0] && replay(e.target.files[0])} />
         </label>
       </div>
 
       <div>
-        <h3 className="font-semibold">{t.dev.events}</h3>
-        <ul className="font-mono text-xs">
+        <h2 className="condensed text-xl font-bold">{t.dev.events}</h2>
+        <ul className="font-mono text-xs text-paper-dim">
           {log.map((e, i) => (
             <li key={i}>{e.t.toFixed(0)} {e.kind} [{e.notes.join(" ")}]</li>
           ))}
@@ -86,18 +88,18 @@ export function DevPage() {
       </div>
 
       <div className="space-y-3">
-        <h3 className="font-semibold">{t.dev.freePlay}</h3>
+        <h2 className="condensed text-xl font-bold">{t.dev.freePlay}</h2>
         <div className="flex gap-3">
-          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="rounded border px-2">
+          <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="rounded-full border border-night-3 bg-night-2 px-3 py-1.5">
             <option value="">{t.dev.template} …</option>
             {manifest.data?.templates.map((tpl) => (
               <option key={tpl.id} value={tpl.id}>{tpl.title}</option>
             ))}
           </select>
           {template && (
-            <select value={keyToken} onChange={(e) => setKeyToken(e.target.value)} className="rounded border px-2">
+            <select value={keyToken} onChange={(e) => setKeyToken(e.target.value)} className="rounded-full border border-night-3 bg-night-2 px-3 py-1.5">
               {template.keys.map((k) => (
-                <option key={k}>{k}</option>
+                <option key={k} value={k}>{displayKey(parseKeyToken(k, template.mode))}</option>
               ))}
             </select>
           )}

@@ -61,6 +61,7 @@ woodshed/
 ├── CLAUDE.md
 ├── ARCHITECTURE.md
 ├── docs/theory-decisions.md   # ledger of every THEORY-DECISION (owner reviews)
+├── docs/curriculum.md         # course plan: units, lessons, licks, fun mechanics
 ├── .claude/agents/            # subagent definitions
 ├── content/
 │   ├── exercises/        # *.yaml — exercise templates (stable IDs!)
@@ -170,8 +171,12 @@ the user is by definition not yet able to spot it. Therefore:
 
 ## Current milestone
 
-See `ARCHITECTURE.md § Milestones`. Start with **M1 — vertical slice** (M1a → M1b → M1c).
-Do not build ahead into later milestones before M1's acceptance criteria pass.
+M1 is done. Next: **M2a** (`ARCHITECTURE.md § 10`), which serves curriculum units 1–2
+(`docs/curriculum.md`). Do not build ahead into later milestones before the current one
+passes `pnpm check`.
+
+Every exercise needs a playful hook (`docs/curriculum.md § Fun mechanics`); a drill
+without one is not done.
 
 ## Agents
 

@@ -8,6 +8,7 @@ import type { PlayChordParams } from "../schema";
 
 export interface PlayChordInstance {
   spec: ChordSpec;
+  numeral: string; // as written: "V", "bII", "ii"
   symbol: string; // "Ab7"
   roman: string; // "V7"
   tones: SpelledNote[]; // spelled answer, for notation
@@ -24,6 +25,7 @@ export function resolvePlayChord(params: PlayChordParams, key: Key): PlayChordIn
   return {
     spec: resolveChordSpec(root, quality, params.voicing as Preset, params.constraints),
     symbol,
+    numeral,
     roman: numeral + suffix,
     tones: chordTones(root, quality),
   };

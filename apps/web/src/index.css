@@ -1,5 +1,54 @@
 @import "tailwindcss";
 
-body {
-  @apply bg-stone-50 text-stone-900;
+/* Blue Note sleeve palette: midnight field, paper type, one brass accent. */
+@theme {
+  --color-night: #15233f;
+  --color-night-2: #1f3358;
+  --color-night-3: #2c4673;
+  --color-paper: #efe8d8;
+  --color-paper-dim: #b9b3a5;
+  --color-brass: #e3a93b;
+  --color-brass-deep: #b98219;
+  --color-sage: #5db596;
+  --color-signal: #e05a44;
+  --color-ivory: #f4efe2;
+  --color-ebony: #1b1b1d;
+
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-stretch: 100%;
+  background: var(--color-night);
+  color: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The chord symbol is the one loud element: extra-condensed black. */
+.display {
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+}
+.condensed {
+  font-stretch: 75%;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+@keyframes stamp {
+  0% { transform: scale(1.12) rotate(-2deg); opacity: 0.4; }
+  60% { transform: scale(0.98) rotate(0.5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); }
+}
+.stamp {
+  animation: stamp 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp { animation: none; }
 }
