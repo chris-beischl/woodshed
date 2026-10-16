@@ -54,6 +54,8 @@ def get_settings_row(db: Session) -> SettingsRow:
             desired_retention=0.9,
             timezone="Europe/Berlin",
             day_rollover_hour=4,
+            new_cards_per_day=10,
+            keys_in_progress=4,
         )
         db.add(row)
         db.flush()

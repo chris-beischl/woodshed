@@ -1,14 +1,14 @@
 """Daily planner (ARCHITECTURE.md 7). Pure: all inputs, including `now`, are parameters."""
 
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, time, timedelta
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from woodshed_api.content.manifest import Manifest, Template
-from woodshed_api.scheduling.scheduler import retrievability
+from woodshed_api.content.manifest import Lesson, Manifest, Template
+from woodshed_api.scheduling.scheduler import retrievability, state_name
 
 EMA_ALPHA = 0.3
 MIN_ESTIMATE_SECONDS = 1.0
@@ -21,6 +21,8 @@ class PlannerSettings:
     desired_retention: float
     timezone: str
     day_rollover_hour: int
+    new_cards_per_day: int = 10
+    keys_in_progress: int = 4
 
 
 @dataclass(frozen=True)
@@ -39,6 +41,7 @@ class LogEntry:
     template_id: str
     duration_ms: int
     source: str
+    card_id: str = ""
 
 
 @dataclass(frozen=True)
@@ -55,6 +58,7 @@ class Plan:
     items: list[PlanItem]
     overflow: int
     remaining_seconds: float
+    next_lesson: Lesson | None = None
 
 
 def practice_day_bounds(
@@ -112,12 +116,25 @@ def _interleave(items: list[PlanItem]) -> list[PlanItem]:
     return out
 
 
+def next_lesson(manifest: Manifest, completed: Collection[str]) -> Lesson | None:
+    """Lowest-order visible lesson not completed whose prerequisites are all completed."""
+    for lesson in sorted(manifest.lessons, key=lambda x: x.order):
+        if (
+            not lesson.hidden
+            and lesson.id not in completed
+            and all(p in completed for p in lesson.prerequisites)
+        ):
+            return lesson
+    return None
+
+
 def build_plan(
     now: datetime,
     settings: PlannerSettings,
     manifest: Manifest,
     cards: Sequence[PlannerCard],
     logs: Sequence[LogEntry],
+    completed_lessons: Collection[str] = (),
 ) -> Plan:
     day_start, day_end = practice_day_bounds(now, settings.timezone, settings.day_rollover_hour)
     spent = sum(
@@ -126,6 +143,15 @@ def build_plan(
         if log.source == "review" and day_start <= log.ts <= now
     )
     budget = max(0.0, settings.daily_minutes * 60 - spent)
+
+    # Cards whose first review (earliest review-source log) happened this practice day.
+    first_review: dict[str, datetime] = {}
+    for log in logs:
+        if log.source == "review" and log.card_id:
+            if log.card_id not in first_review or log.ts < first_review[log.card_id]:
+                first_review[log.card_id] = log.ts
+    new_today = sum(1 for ts in first_review.values() if day_start <= ts <= now)
+    new_left = max(0, settings.new_cards_per_day - new_today)
     estimates = _estimates(manifest, logs)
     templates: dict[str, Template] = {t.id: t for t in manifest.templates}
 
@@ -179,13 +205,23 @@ def build_plan(
     review_cap = (1 - settings.new_card_ratio) * budget
     new_cap = settings.new_card_ratio * budget
     chosen: set[str] = set()
+    in_progress: dict[str, int] = defaultdict(int)
+    for c in cards:
+        if c.fsrs_state is not None and state_name(c.fsrs_state) in ("learning", "relearning"):
+            in_progress[c.template_id] += 1
+    new_chosen = 0
     used = {"review": 0.0, "new": 0.0}
 
     def take(
         candidates: list[PlanItem], bucket: str, limit: float, total_limit: float | None
     ) -> None:
+        nonlocal new_chosen
         for it in candidates:
             if it.card_id in chosen:
+                continue
+            if it.is_new and (
+                new_chosen >= new_left or in_progress[it.template_id] >= settings.keys_in_progress
+            ):
                 continue
             if used[bucket] + it.estimated_seconds > limit + 1e-9:
                 continue
@@ -195,6 +231,9 @@ def build_plan(
                 continue
             chosen.add(it.card_id)
             used[bucket] += it.estimated_seconds
+            if it.is_new:
+                new_chosen += 1
+                in_progress[it.template_id] += 1
 
     take(review_items, "review", review_cap, None)
     take(new_items, "new", new_cap, None)
@@ -204,4 +243,9 @@ def build_plan(
 
     selected = [i for i in review_items + new_items if i.card_id in chosen]
     overflow = sum(1 for i in review_items if i.card_id not in chosen)
-    return Plan(items=_interleave(selected), overflow=overflow, remaining_seconds=budget)
+    return Plan(
+        items=_interleave(selected),
+        overflow=overflow,
+        remaining_seconds=budget,
+        next_lesson=next_lesson(manifest, completed_lessons),
+    )

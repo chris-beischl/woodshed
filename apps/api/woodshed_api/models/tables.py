@@ -78,3 +78,9 @@ class SettingsRow(Base):
     desired_retention: Mapped[float] = mapped_column(Float, nullable=False, default=0.9)
     timezone: Mapped[str] = mapped_column(String, nullable=False, default="Europe/Berlin")
     day_rollover_hour: Mapped[int] = mapped_column(Integer, nullable=False, default=4)
+    new_cards_per_day: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=10, server_default="10"
+    )
+    keys_in_progress: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=4, server_default="4"
+    )

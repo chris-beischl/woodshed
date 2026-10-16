@@ -16,3 +16,4 @@ entries and sets them to `approved` or `changed`.
 | 9 | `guide_tones` on triads is rejected (PresetError), like `shell` | No 7th to guide | `apps/web/src/evaluation/presets.ts` | open |
 | 10 | A played note whose pitch class is not in `tones` (and not an allowed tension) is reported as `unexpected`, never as a forbidden degree | `forbidden` only lists tokens the spec names explicitly | `apps/web/src/evaluation/match.ts` | open |
 | 11 | Progression runner: a committed mismatch only counts if the same note set settled while the current chord was expected | Releasing the just-accepted chord must not count against the next one | `apps/web/src/evaluation/runner.ts`, ARCHITECTURE § 4.5 | open |
+| 12 | Triad drills (`triads-major`, `triads-minor`) require the 5th, overriding the `any` preset where 5 is optional | A lesson about building triads must not accept C–E as "C major"; dim/aug already require their altered 5th | `content/exercises/triads-*.yaml` | open |

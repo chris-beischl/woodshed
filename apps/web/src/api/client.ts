@@ -7,6 +7,7 @@ export type PlanItem = Schemas["PlanItemOut"];
 export type ReviewIn = Schemas["ReviewIn"];
 export type ReviewOut = Schemas["ReviewOut"];
 export type Settings = Schemas["SettingsModel"];
+export type Progress = Schemas["ProgressOut"];
 
 const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
 const TOKEN = import.meta.env.VITE_WOODSHED_TOKEN ?? "dev-token";
@@ -38,6 +39,21 @@ export function useCompleteLesson() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => request<Schemas["LessonCompleteOut"]>("POST", `/lessons/${encodeURIComponent(id)}/complete`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["plan"] }),
+    onSuccess: () => Promise.all([qc.invalidateQueries({ queryKey: ["plan"] }), qc.invalidateQueries({ queryKey: ["progress"] })]),
+  });
+}
+
+export const useProgress = () => useQuery({ queryKey: ["progress"], queryFn: () => request<Progress>("GET", "/progress") });
+
+export const useSettings = () => useQuery({ queryKey: ["settings"], queryFn: () => request<Settings>("GET", "/settings") });
+
+export function useSaveSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (s: Settings) => request<Settings>("PUT", "/settings", s),
+    onSuccess: (s) => {
+      qc.setQueryData(["settings"], s);
+      return qc.invalidateQueries({ queryKey: ["plan"] });
+    },
   });
 }

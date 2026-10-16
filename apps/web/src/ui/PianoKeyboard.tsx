@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { usePlayback } from "../audio/player";
 import { useInput, virtualKeyboard } from "../input/store";
 import { t } from "./strings";
 
@@ -12,6 +13,7 @@ const KEYMAP: Record<string, number> = {
 export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: number }) {
   const held = useInput((s) => s.held);
   const sustain = useInput((s) => s.sustain);
+  const sounding = usePlayback((s) => s.notes);
   const [latched, setLatched] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: numb
             key={m}
             aria-label={`MIDI ${m}`}
             onClick={() => toggle(m)}
-            className={`absolute top-0 h-full rounded-b-[3px] border-x border-b border-ebony/40 transition-colors duration-75 ${held.includes(m) ? "bg-brass" : "bg-ivory hover:bg-paper"}`}
+            className={`absolute top-0 h-full rounded-b-[3px] border-x border-b border-ebony/40 transition-colors duration-75 ${held.includes(m) ? "bg-brass" : sounding.includes(m) ? "bg-sage" : "bg-ivory hover:bg-paper"}`}
             style={{ left: `${i * whiteWidth}%`, width: `${whiteWidth}%` }}
           >
             {m % 12 === 0 && <span className="condensed absolute bottom-1.5 left-0 right-0 text-[11px] text-ebony/50">C{m / 12 - 1}</span>}
@@ -72,7 +74,7 @@ export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: numb
                 key={m}
                 aria-label={`MIDI ${m}`}
                 onClick={() => toggle(m)}
-                className={`absolute top-0 z-10 h-[62%] rounded-b-[3px] shadow-[inset_0_-4px_0_rgba(255,255,255,0.08)] transition-colors duration-75 ${held.includes(m) ? "bg-brass-deep" : "bg-ebony"}`}
+                className={`absolute top-0 z-10 h-[62%] rounded-b-[3px] shadow-[inset_0_-4px_0_rgba(255,255,255,0.08)] transition-colors duration-75 ${held.includes(m) ? "bg-brass-deep" : sounding.includes(m) ? "bg-sage" : "bg-ebony"}`}
                 style={{ left: `${leftWhites * whiteWidth - whiteWidth * 0.3}%`, width: `${whiteWidth * 0.6}%` }}
               />
             );

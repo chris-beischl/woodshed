@@ -1,0 +1,13 @@
+id: pop-i-v-vi-iv
+type: play_progression
+title: "Die Pop-Progression I–V–vi–IV"
+tags: [pop, tune, triads, voice-leading]
+importance: 4
+targetSeconds: 10
+estimatedSeconds: 20
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["I:maj", "V:maj", "vi:m", "IV:maj"]
+voicing: any

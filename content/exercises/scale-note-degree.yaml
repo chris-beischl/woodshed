@@ -1,0 +1,13 @@
+id: scale-note-degree
+type: choice
+title: "Stufen-Sprint: Welche Stufe?"
+tags: [scales, degrees]
+importance: 3
+targetSeconds: 24
+estimatedSeconds: 40
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: choice }
+ask: note_degree
+rounds: 8

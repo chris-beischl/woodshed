@@ -1,0 +1,13 @@
+id: diatonic-triads-ladder
+type: play_progression
+title: "Die Stufenleiter: alle Dreiklänge einer Tonart"
+tags: [triads, diatonic, roman]
+importance: 4
+targetSeconds: 20
+estimatedSeconds: 35
+mode: major
+keys: all
+prompt: { kind: roman }
+response: { kind: play }
+progression: ["I:maj", "ii:m", "iii:m", "IV:maj", "V:maj", "vi:m", "vii:dim"]
+voicing: any

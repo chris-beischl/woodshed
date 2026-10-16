@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import { degreePitchClass, type DegreeToken } from "../src/theory/degrees";
-import { keysInIntroOrder, keyToken, parseKeyName, type Key } from "../src/theory/keys";
+import { keysInIntroOrder, keyToken, parseKeyName, type Key, type Mode } from "../src/theory/keys";
+import { majorScale } from "../src/theory/scale";
 import { pitchClass } from "../src/theory/note";
 import { resolvePlayChord } from "../src/exercises/play_chord/resolve";
 import {
@@ -11,6 +12,7 @@ import {
   type Lesson,
   type Manifest,
   type ManifestTemplate,
+  type PlayChordParams,
 } from "../src/exercises/schema";
 
 export interface SourceFile {
@@ -40,20 +42,44 @@ function pitchClassCollisions(tones: DegreeToken[], rootPc: number): string[] {
   return errors;
 }
 
+/** The chords a template plays, as play_chord params — so every type shares one check. */
+function chordsOf(type: string, params: unknown): PlayChordParams[] {
+  if (type === "play_chord") return [PARAM_SCHEMAS.play_chord.parse(params)];
+  if (type === "play_progression") {
+    const p = PARAM_SCHEMAS.play_progression.parse(params);
+    return p.progression.map((chord) => ({ chord, voicing: p.voicing, constraints: p.constraints }));
+  }
+  return [];
+}
+
 /** Instantiate every key: catches bad numerals, spelling range overflow, preset misuse. */
-function validateInstances(type: string, params: unknown, keys: Key[]): string[] {
-  if (type !== "play_chord") return [];
+function validateInstances(type: string, mode: Mode, params: unknown, keys: Key[]): string[] {
   const errors: string[] = [];
+  if (type === "choice" && mode !== "major") errors.push("choice quizzes support major keys only (minor: unit 4)");
   for (const key of keys) {
     try {
-      const inst = resolvePlayChord(PARAM_SCHEMAS.play_chord.parse(params), key);
-      const tones = Object.keys(inst.spec.tones) as DegreeToken[];
-      errors.push(...pitchClassCollisions(tones, pitchClass(inst.spec.root)).map((e) => `${keyToken(key)}: ${e}`));
+      if (type === "choice") majorScale(key.tonic);
     } catch (e) {
       errors.push(`${keyToken(key)}: ${describe(e)}`);
     }
+    for (const chord of chordsOf(type, params)) {
+      const at = `${keyToken(key)} ${chord.chord}`;
+      try {
+        const inst = resolvePlayChord(chord, key);
+        const tones = Object.keys(inst.spec.tones) as DegreeToken[];
+        errors.push(...pitchClassCollisions(tones, pitchClass(inst.spec.root)).map((e) => `${at}: ${e}`));
+      } catch (e) {
+        errors.push(`${at}: ${describe(e)}`);
+      }
+    }
   }
   return errors;
+}
+
+/** IDs double as file names so lessons and templates can be found by ID. */
+function checkFileName(file: SourceFile, id: string, errors: string[]): void {
+  const base = file.path.split("/").pop()!.replace(/\.(yaml|mdx)$/, "");
+  if (base !== id) errors.push(`${file.path}: file name must equal id "${id}"`);
 }
 
 function parseTemplate(file: SourceFile, errors: string[]): ManifestTemplate | null {
@@ -87,7 +113,8 @@ function parseTemplate(file: SourceFile, errors: string[]): ManifestTemplate | n
     at(describe(e));
     return null;
   }
-  for (const e of validateInstances(t.type, params.data, keys)) at(e);
+  checkFileName(file, t.id, errors);
+  for (const e of validateInstances(t.type, t.mode, params.data, keys)) at(e);
   return { ...t, keys: keys.map(keyToken), params: params.data as Record<string, unknown> };
 }
 
@@ -102,6 +129,7 @@ function parseLesson(file: SourceFile, errors: string[]): Lesson | null {
     errors.push(`${file.path}: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
     return null;
   }
+  checkFileName(file, parsed.data.id, errors);
   return parsed.data;
 }
 

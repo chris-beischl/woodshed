@@ -1,52 +1,54 @@
 import { useEffect, useRef } from "react";
-import { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
-import { formatNote, letterIndex, type SpelledNote } from "../theory/note";
+import { Accidental, Annotation, Formatter, Renderer, Stave, StaveNote, Voice } from "vexflow";
+import type { SpelledNote } from "../theory/note";
+import { stackPitches } from "../theory/pitch";
 import { displayNote } from "../ui/music";
 
 const VF_ACCIDENTAL = { [-2]: "bb", [-1]: "b", 0: "", 1: "#", 2: "##" } as const;
+const SCALE = 1.3;
 
-/** Stack spelled chord tones upward from `octave`, one letter step at a time. */
+/** VexFlow keys for spelled tones stacked upward from `octave`. */
 export function stackKeys(tones: SpelledNote[], octave = 4): string[] {
-  let current = octave;
-  let prev = -1;
-  return tones.map((n) => {
-    const li = letterIndex(n.letter);
-    if (prev !== -1 && li <= prev) current++;
-    prev = li;
-    return `${n.letter.toLowerCase()}${VF_ACCIDENTAL[n.accidental]}/${current}`;
-  });
+  return stackPitches(tones, octave).map((p) => `${p.letter.toLowerCase()}${VF_ACCIDENTAL[p.accidental]}/${p.octave}`);
 }
 
-/** Renders a spelled chord as a whole-note chord on a treble staff. */
-export function ChordNotation({ tones, label }: { tones: SpelledNote[]; label?: string }) {
+/** One or more spelled chords as whole notes on a treble staff, each labelled. */
+export function ChordNotation({ chords, labels, caption }: { chords: SpelledNote[][]; labels?: string[]; caption?: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const width = 70 + chords.length * 90;
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.innerHTML = "";
     const renderer = new Renderer(el, Renderer.Backends.SVG);
-    renderer.resize(286, 170);
+    renderer.resize(width * SCALE, 130 * SCALE);
     const ctx = renderer.getContext();
-    ctx.scale(1.3, 1.3);
-    const stave = new Stave(10, 20, 200).addClef("treble");
+    ctx.scale(SCALE, SCALE);
+    const stave = new Stave(5, 10, width - 10).addClef("treble");
     stave.setContext(ctx).draw();
 
-    const note = new StaveNote({ keys: stackKeys(tones), duration: "w" });
-    tones.forEach((n, i) => {
-      if (n.accidental !== 0) note.addModifier(new Accidental(VF_ACCIDENTAL[n.accidental]), i);
+    const notes = chords.map((tones, ci) => {
+      const note = new StaveNote({ keys: stackKeys(tones), duration: "w" });
+      tones.forEach((n, i) => {
+        if (n.accidental !== 0) note.addModifier(new Accidental(VF_ACCIDENTAL[n.accidental]), i);
+      });
+      const label = labels?.[ci];
+      if (label) note.addModifier(new Annotation(label).setVerticalJustification(Annotation.VerticalJustify.BOTTOM));
+      return note;
     });
-    const voice = new Voice({ numBeats: 4, beatValue: 4 }).addTickables([note]);
-    new Formatter().joinVoices([voice]).format([voice], 150);
+    const voice = new Voice({ numBeats: 4 * chords.length, beatValue: 4 }).addTickables(notes);
+    new Formatter().joinVoices([voice]).format([voice], width - 80);
     voice.draw(ctx, stave);
-  }, [tones]);
+  }, [chords, labels, width]);
 
   return (
     <figure className="inline-block">
-      <div ref={ref} aria-label={tones.map(formatNote).join(" ")} />
-      {label && (
+      <div ref={ref} aria-label={chords.map((c) => c.map(displayNote).join(" ")).join(", ")} />
+      {caption && (
         <figcaption className="condensed text-center text-base">
-          {label}: <strong>{tones.map(displayNote).join("  ")}</strong>
+          {caption}
+          {chords.length === 1 && <>: <strong>{chords[0]!.map(displayNote).join("  ")}</strong></>}
         </figcaption>
       )}
     </figure>

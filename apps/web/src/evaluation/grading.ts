@@ -17,3 +17,9 @@ export function gradeChoice(a: { correct: boolean; durationMs: number; targetSec
   if (!a.correct) return "again";
   return a.durationMs <= a.targetSeconds * 500 ? "easy" : "good";
 }
+
+/** Quiz round (§ 4.6): no mistakes → good/easy by time; ≤ 25 % wrong → hard; else again. */
+export function gradeQuiz(a: { mistakes: number; rounds: number; durationMs: number; targetSeconds: number }): Rating {
+  if (a.mistakes === 0) return a.durationMs <= a.targetSeconds * 500 ? "easy" : "good";
+  return a.mistakes <= a.rounds / 4 ? "hard" : "again";
+}

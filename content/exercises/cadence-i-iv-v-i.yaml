@@ -1,0 +1,13 @@
+id: cadence-i-iv-v-i
+type: play_progression
+title: "Kadenz I–IV–V–I mit kurzen Wegen"
+tags: [cadence, voice-leading, triads]
+importance: 5
+targetSeconds: 10
+estimatedSeconds: 20
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["I:maj", "IV:maj", "V:maj", "I:maj"]
+voicing: any

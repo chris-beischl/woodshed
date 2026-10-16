@@ -23,8 +23,15 @@ class PlanItemOut(BaseModel):
     is_new: bool
 
 
+class NextLessonOut(BaseModel):
+    id: str
+    title: str
+    estimated_minutes: float
+
+
 class PlanOut(BaseModel):
     items: list[PlanItemOut]
+    next_lesson: NextLessonOut | None
     overflow: int
     remaining_seconds: float
     content_version: str
@@ -91,6 +98,8 @@ class SettingsModel(BaseModel):
     desired_retention: float = Field(default=0.9, ge=0.7, le=0.99)
     timezone: str = "Europe/Berlin"
     day_rollover_hour: int = Field(default=4, ge=0, le=23)
+    new_cards_per_day: int = Field(default=10, ge=0, le=100)
+    keys_in_progress: int = Field(default=4, ge=1, le=12)
 
     @field_validator("timezone")
     @classmethod

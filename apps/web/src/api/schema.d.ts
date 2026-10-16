@@ -228,6 +228,15 @@ export interface components {
             /** Cards Created */
             cards_created: number;
         };
+        /** NextLessonOut */
+        NextLessonOut: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Estimated Minutes */
+            estimated_minutes: number;
+        };
         /** PlanItemOut */
         PlanItemOut: {
             /** Card Id */
@@ -245,6 +254,7 @@ export interface components {
         PlanOut: {
             /** Items */
             items: components["schemas"]["PlanItemOut"][];
+            next_lesson: components["schemas"]["NextLessonOut"] | null;
             /** Overflow */
             overflow: number;
             /** Remaining Seconds */
@@ -329,6 +339,16 @@ export interface components {
              * @default 4
              */
             day_rollover_hour: number;
+            /**
+             * New Cards Per Day
+             * @default 10
+             */
+            new_cards_per_day: number;
+            /**
+             * Keys In Progress
+             * @default 4
+             */
+            keys_in_progress: number;
         };
         /** ValidationError */
         ValidationError: {

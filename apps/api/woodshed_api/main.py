@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import sessionmaker
 
-from woodshed_api.config import CORS_ORIGINS, load_config
+from woodshed_api.config import CORS_ORIGIN_REGEX, load_config
 from woodshed_api.content import load_manifest
 from woodshed_api.db import init_schema, make_engine
 from woodshed_api.deps import require_token
@@ -38,7 +38,7 @@ def create_app(
     app.state.session_factory = sessionmaker(engine, expire_on_commit=False)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=CORS_ORIGINS,
+        allow_origin_regex=CORS_ORIGIN_REGEX,
         allow_methods=["*"],
         allow_headers=["*"],
     )

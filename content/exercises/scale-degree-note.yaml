@@ -1,0 +1,13 @@
+id: scale-degree-note
+type: choice
+title: "Stufen-Sprint: Welcher Ton?"
+tags: [scales, degrees]
+importance: 3
+targetSeconds: 24
+estimatedSeconds: 40
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: choice }
+ask: degree_note
+rounds: 8

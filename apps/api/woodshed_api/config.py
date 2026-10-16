@@ -6,7 +6,8 @@ from pathlib import Path
 
 API_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_MANIFEST = "../web/public/manifest.json"
-CORS_ORIGINS = ["http://localhost:5173"]
+# Any local dev port (a second dev server falls back to 5174, 5175, ...).
+CORS_ORIGIN_REGEX = r"http://(localhost|127\.0\.0\.1)(:\d+)?"
 
 
 @dataclass(frozen=True)

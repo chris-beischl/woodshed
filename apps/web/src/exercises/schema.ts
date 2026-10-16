@@ -27,9 +27,28 @@ export const playChordParams = z
   })
   .strict();
 
+export const playProgressionParams = z
+  .object({
+    progression: z.array(z.string().min(1)).min(2), // roman numerals, e.g. ["ii:m7", "V:7", "I:maj7"]
+    voicing: playChordParams.shape.voicing,
+    constraints: constraintsSchema.default({}),
+    maxAttemptsPerChord: z.number().int().positive().default(3),
+  })
+  .strict();
+
+export const choiceParams = z
+  .object({
+    ask: z.enum(["degree_note", "note_degree"]),
+    degrees: z.array(z.number().int().min(1).max(7)).min(1).default([1, 2, 3, 4, 5, 6, 7]),
+    rounds: z.number().int().min(1).max(30).default(8),
+  })
+  .strict();
+
 /** Each exercise type registers its YAML params schema here (ARCHITECTURE § 5.1). */
 export const PARAM_SCHEMAS = {
   play_chord: playChordParams,
+  play_progression: playProgressionParams,
+  choice: choiceParams,
 } as const;
 
 export type ExerciseType = keyof typeof PARAM_SCHEMAS;
@@ -57,8 +76,10 @@ export const lessonFrontmatterSchema = z
     title: z.string().min(1),
     order: z.number().int().nonnegative(),
     estimatedMinutes: z.number().positive(),
+    unit: z.number().int().min(1).max(6),
     introduces: z.array(kebab).default([]),
     prerequisites: z.array(kebab).default([]),
+    hidden: z.boolean().default(false),
   })
   .strict();
 
@@ -78,3 +99,5 @@ export type Manifest = z.infer<typeof manifestSchema>;
 export type ManifestTemplate = Manifest["templates"][number];
 export type Lesson = z.infer<typeof lessonFrontmatterSchema>;
 export type PlayChordParams = z.infer<typeof playChordParams>;
+export type PlayProgressionParams = z.infer<typeof playProgressionParams>;
+export type ChoiceParams = z.infer<typeof choiceParams>;

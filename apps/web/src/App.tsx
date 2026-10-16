@@ -1,7 +1,10 @@
 import { NavLink, Route, Routes } from "react-router";
 import { useInput } from "./input/store";
+import { CoursePage } from "./lessons/CoursePage";
+import { LessonPage } from "./lessons/LessonPage";
 import { DevPage } from "./practice/DevPage";
 import { PracticePage } from "./practice/PracticePage";
+import { SettingsPage } from "./practice/SettingsPage";
 import { PianoKeyboard } from "./ui/PianoKeyboard";
 import { t } from "./ui/strings";
 
@@ -28,22 +31,31 @@ export function App() {
   const link = ({ isActive }: { isActive: boolean }) =>
     `condensed text-lg ${isActive ? "text-paper underline decoration-brass decoration-2 underline-offset-8" : "text-paper-dim hover:text-paper"}`;
   return (
-    <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-4 pt-5 pb-4 sm:px-8">
+    <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-4 pt-5 sm:px-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <nav className="flex items-baseline gap-6">
           <span className="display text-4xl text-brass">{t.appName}</span>
           <NavLink to="/" end className={link}>{t.nav.practice}</NavLink>
+          <NavLink to="/kurs" className={link}>{t.nav.course}</NavLink>
+          <NavLink to="/einstellungen" className={link}>{t.nav.settings}</NavLink>
           <NavLink to="/dev" className={link}>{t.nav.dev}</NavLink>
         </nav>
         <MidiPicker />
       </header>
-      <main className="flex flex-1 flex-col justify-center">
+      <main className="flex flex-1 flex-col">
         <Routes>
-          <Route path="/" element={<PracticePage />} />
+          {/* The practice screen floats in the middle like a record sleeve; other pages read top-down. */}
+          <Route path="/" element={<div className="my-auto"><PracticePage /></div>} />
+          <Route path="/kurs" element={<CoursePage />} />
+          <Route path="/lektion/:id" element={<LessonPage />} />
+          <Route path="/einstellungen" element={<SettingsPage />} />
           <Route path="/dev" element={<DevPage />} />
         </Routes>
       </main>
-      <PianoKeyboard />
+      {/* Pinned so held keys stay visible while scrolling through a lesson. */}
+      <div className="sticky bottom-0 -mx-4 bg-night/95 px-4 pt-3 pb-3 backdrop-blur sm:-mx-8 sm:px-8">
+        <PianoKeyboard />
+      </div>
     </div>
   );
 }

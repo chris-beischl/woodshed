@@ -134,6 +134,8 @@ def test_settings_defaults_and_update(client: TestClient) -> None:
         "desired_retention": 0.9,
         "timezone": "Europe/Berlin",
         "day_rollover_hour": 4,
+        "new_cards_per_day": 10,
+        "keys_in_progress": 4,
     }
     new = {
         "daily_minutes": 45,
@@ -141,6 +143,8 @@ def test_settings_defaults_and_update(client: TestClient) -> None:
         "desired_retention": 0.85,
         "timezone": "America/New_York",
         "day_rollover_hour": 5,
+        "new_cards_per_day": 0,
+        "keys_in_progress": 12,
     }
     assert client.put("/settings", json=new).json() == new
     assert client.get("/settings").json() == new
@@ -155,5 +159,31 @@ def test_settings_validation(client: TestClient) -> None:
         {"daily_minutes": 0},
         {"new_card_ratio": 1.5},
         {"desired_retention": 1.0},
+        {"new_cards_per_day": 101},
+        {"new_cards_per_day": -1},
+        {"keys_in_progress": 0},
+        {"keys_in_progress": 13},
     ):
         assert client.put("/settings", json=base | bad).status_code == 422, bad
+
+
+def test_lesson_review_for_nonexistent_card_is_logged(client: TestClient) -> None:
+    r = review(client, "ghost@C", source="lesson")
+    assert r.status_code == 200
+    assert r.json() == {"card_id": "ghost@C", "state": "new", "due": None}
+    # idempotent replay of the same id
+    rid = str(uuid.uuid4())
+    first = review(client, "ghost@C", source="lesson", id=rid)
+    assert review(client, "ghost@C", source="lesson", id=rid).json() == first.json()
+
+
+def test_plan_next_lesson_progresses(client: TestClient) -> None:
+    assert client.get("/plan", params={"now": NOW}).json()["next_lesson"] == {
+        "id": "triads-intro",
+        "title": "Triads",
+        "estimated_minutes": 15,
+    }
+    client.post("/lessons/triads-intro/complete")
+    assert client.get("/plan", params={"now": NOW}).json()["next_lesson"]["id"] == "minor-intro"
+    client.post("/lessons/minor-intro/complete")
+    assert client.get("/plan", params={"now": NOW}).json()["next_lesson"] is None

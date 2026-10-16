@@ -20,16 +20,25 @@ def _card_or_404(db: Session, card_id: str) -> CardRow:
     return card
 
 
+def _out_for(db: Session, card_id: str, source: str) -> ReviewOut:
+    card = db.get(CardRow, card_id)
+    if card is None and source == "lesson":
+        return ReviewOut(card_id=card_id, state="new", due=None)
+    return _out(_card_or_404(db, card_id))
+
+
 @router.post("/reviews", response_model=ReviewOut)
 def post_review(body: ReviewIn, db: DbDep, manifest: ManifestDep, now: NowDep) -> ReviewOut:
     existing = db.get(ReviewLog, body.id)
     if existing is not None:
-        return _out(_card_or_404(db, existing.card_id))
-    card = _card_or_404(db, body.card_id)
+        return _out_for(db, existing.card_id, existing.source)
+    card = db.get(CardRow, body.card_id)
+    if card is None and body.source == "review":
+        raise HTTPException(404, f"Unknown card: {body.card_id}")
     db.add(
         ReviewLog(
             id=body.id,
-            card_id=card.id,
+            card_id=body.card_id,
             ts=now,
             rating=body.rating,
             duration_ms=body.duration_ms,
@@ -39,7 +48,7 @@ def post_review(body: ReviewIn, db: DbDep, manifest: ManifestDep, now: NowDep) -
             details=body.details,
         )
     )
-    if body.source == "review":
+    if body.source == "review" and card is not None:
         s = get_settings_row(db)
         state, due = scheduler.review(
             card.fsrs_state, body.rating, now, body.duration_ms, s.desired_retention
@@ -47,4 +56,6 @@ def post_review(body: ReviewIn, db: DbDep, manifest: ManifestDep, now: NowDep) -
         card.fsrs_state = state
         card.due = due
     db.commit()
+    if card is None:
+        return ReviewOut(card_id=body.card_id, state="new", due=None)
     return _out(card)

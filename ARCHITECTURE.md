@@ -438,7 +438,11 @@ playback), `Keyboard`, `Notation`, `Exercise` (renders a template instance inlin
 
 **Lesson completion** (`POST /lessons/{id}/complete`) creates all cards of the
 `introduces` templates in state `new`. In-lesson exercise attempts are logged with
-`source: "lesson"` but do not update FSRS state.
+`source: "lesson"` but do not update FSRS state; their `card_id` need not exist yet
+(the lesson runs before its cards are created).
+
+Frontmatter also carries `unit` (curriculum unit, 1–6) for the course overview, and
+optionally `hidden: true` to retire a lesson without deleting its ID.
 
 ---
 
@@ -460,6 +464,12 @@ Input: `settings.dailyMinutes`, `settings.newCardRatio` (default 0.2),
 2. **New cards**: cards in app state `new` (introduced, never reviewed — see § 8.3),
    ordered by lesson order, then key introduction order (§ 3.2), then template
    importance.
+   **Gradual key unlock**: a template has at most `settings.keysInProgress` (default 4)
+   keys *in progress* — cards in `learning`/`relearning`, plus new cards already chosen
+   for this plan. Only then does its next key (introduction order) become eligible. So a
+   new template starts in C, F, Bb, Eb and opens G♭ only once one of those settles.
+   **Daily cap**: at most `settings.newCardsPerDay` (default 10) new cards per practice
+   day, counting cards whose first review happened today.
 3. **Time estimate per card**: EMA of measured durations for that template (from
    `review_logs`), falling back to `estimatedSeconds`.
 4. Fill budget: reviews up to `(1 − newCardRatio) × budget`, new cards up to
@@ -467,7 +477,8 @@ Input: `settings.dailyMinutes`, `settings.newCardRatio` (default 0.2),
 5. **Ordering within the session**: interleave — avoid the same template twice in a
    row and the same key twice in a row where possible.
 6. Response also contains: overflow count (due but not scheduled) and the next
-   unlocked lesson, suggested only if it fits the remaining budget.
+   lesson: the lowest-`order` lesson not completed whose prerequisites are all completed
+   (suggested regardless of budget; the UI shows its `estimatedMinutes`).
 
 The plan is computed at session start and returned as an ordered list of card IDs.
 
@@ -485,7 +496,7 @@ review_logs    id (client-generated uuid, idempotent POST), card_id (indexed), t
                details (json: ChordMatchResults, chosen option, pedal usage, ...)
 lesson_progress lesson_id (pk), completed_at
 settings       single row: daily_minutes, new_card_ratio, desired_retention,
-               timezone, day_rollover_hour
+               timezone, day_rollover_hour, new_cards_per_day, keys_in_progress
 ```
 
 `content_version` is the manifest hash at review time, so analytics stay

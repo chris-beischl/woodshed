@@ -212,3 +212,132 @@ def test_interleave_relaxes_when_impossible() -> None:
     items = [item("a", "C"), item("a", "C"), item("a", "F")]
     out = _interleave(items)
     assert [i.key for i in out] == ["C", "F", "C"]
+
+
+# --- M2a: daily cap, gradual key unlock, next lesson ---------------------------------
+
+KEYS = ["C", "F", "Bb", "Eb", "Ab", "Db", "Gb", "B", "E", "A", "D", "G"]
+BIG = PlannerSettings(600, 1.0, 0.9, "Europe/Berlin", 4, 100, 4)  # budget never binds
+
+
+def learning_card(template: str, key: str, state: str = "learning") -> PlannerCard:
+    c = reviewed_card(template, key, NOW - timedelta(days=5), times=1)
+    assert c.fsrs_state is not None
+    if state == "relearning":
+        c = reviewed_card(template, key, NOW - timedelta(days=5), rating="again", times=1)
+        s, d = review(c.fsrs_state, "again", NOW - timedelta(days=4), 5000, 0.9)
+        # force relearning state regardless of fsrs internals
+        s = {**s, "state": 3}
+        c = PlannerCard(c.id, template, key, s, NOW + timedelta(days=30), False)
+    else:
+        c = PlannerCard(c.id, template, key, {**c.fsrs_state, "state": 1}, c.due, False)
+    return c
+
+
+def new_ids(plan_items: list[PlanItem]) -> list[str]:
+    return sorted(i.card_id for i in plan_items if i.is_new)
+
+
+def test_daily_cap(manifest: Manifest) -> None:
+    settings = PlannerSettings(600, 1.0, 0.9, "Europe/Berlin", 4, 3, 12)
+    cards = [new_card("triads-major", k) for k in KEYS]
+    plan = build_plan(NOW, settings, manifest, cards, [])
+    assert len([i for i in plan.items if i.is_new]) == 3
+    assert (
+        build_plan(
+            NOW, PlannerSettings(600, 1.0, 0.9, "Europe/Berlin", 4, 0, 12), manifest, cards, []
+        ).items
+        == []
+    )
+
+
+def test_cap_counts_cards_first_reviewed_today(manifest: Manifest) -> None:
+    settings = PlannerSettings(600, 1.0, 0.9, "Europe/Berlin", 4, 3, 12)
+    cards = [new_card("triads-major", k) for k in KEYS[3:]]
+    today = NOW - timedelta(hours=1)
+    logs = [
+        LogEntry(today, "triads-major", 5000, "review", "triads-major@C"),
+        LogEntry(today, "triads-major", 5000, "review", "triads-major@F"),
+        # reviewed again today, but first reviewed yesterday: not counted
+        LogEntry(NOW - timedelta(days=1), "triads-major", 5000, "review", "triads-major@Bb"),
+        LogEntry(today, "triads-major", 5000, "review", "triads-major@Bb"),
+        # lesson-source log is not a review
+        LogEntry(today, "triads-major", 5000, "lesson", "triads-major@Eb"),
+    ]
+    plan = build_plan(NOW, settings, manifest, cards, logs)
+    assert len([i for i in plan.items if i.is_new]) == 1
+
+
+def test_key_unlock_limits_new_keys(manifest: Manifest) -> None:
+    cards = [new_card("triads-major", k) for k in KEYS]
+    plan = build_plan(NOW, BIG, manifest, cards, [])
+    assert new_ids(plan.items) == sorted(f"triads-major@{k}" for k in KEYS[:4])
+
+
+def test_key_unlock_counts_learning_and_relearning(manifest: Manifest) -> None:
+    new = [new_card("triads-major", k) for k in KEYS[2:]]
+    for state_cards in (
+        [learning_card("triads-major", "C"), learning_card("triads-major", "F")],
+        [learning_card("triads-major", "C"), learning_card("triads-major", "F", "relearning")],
+    ):
+        plan = build_plan(NOW, BIG, manifest, new + state_cards, [])
+        assert new_ids(plan.items) == ["triads-major@Bb", "triads-major@Eb"]
+
+
+def test_key_unlock_ignores_review_state_cards(manifest: Manifest) -> None:
+    done = [reviewed_card("triads-major", k, NOW - timedelta(days=30)) for k in KEYS[:2]]
+    assert all(c.fsrs_state and c.fsrs_state["state"] == 2 for c in done)
+    new = [new_card("triads-major", k) for k in KEYS[2:]]
+    plan = build_plan(NOW, BIG, manifest, new + done, [])
+    assert len(new_ids(plan.items)) == 4
+
+
+def test_cap_and_unlock_interplay_across_templates(manifest: Manifest) -> None:
+    # cap 6: major takes its 4 (unlock limit), minor gets the remaining 2.
+    settings = PlannerSettings(600, 1.0, 0.9, "Europe/Berlin", 4, 6, 4)
+    cards = [new_card(t, k) for t in ("triads-major", "triads-minor") for k in KEYS]
+    plan = build_plan(NOW, settings, manifest, cards, [])
+    ids = new_ids(plan.items)
+    assert ids == sorted(
+        [f"triads-major@{k}" for k in KEYS[:4]] + [f"triads-minor@{k}" for k in KEYS[:2]]
+    )
+
+
+def test_next_lesson(manifest: Manifest) -> None:
+    def nxt(done: set[str]) -> str | None:
+        n = build_plan(NOW, SETTINGS, manifest, [], [], done).next_lesson
+        return n.id if n else None
+
+    assert nxt(set()) == "triads-intro"
+    assert nxt({"triads-intro"}) == "minor-intro"
+    assert nxt({"triads-intro", "minor-intro"}) is None
+    # prerequisites unmet -> skipped even if lower order is hidden/completed
+    assert nxt({"minor-intro"}) == "triads-intro"
+
+
+def test_next_lesson_prereqs_and_hidden() -> None:
+    m = Manifest.model_validate(
+        {
+            "version": "v",
+            "templates": [],
+            "lessons": [
+                {"id": "a", "order": 1, "title": "A", "estimatedMinutes": 5, "hidden": True},
+                {
+                    "id": "b",
+                    "order": 2,
+                    "title": "B",
+                    "estimatedMinutes": 5,
+                    "prerequisites": ["c"],
+                },
+                {"id": "c", "order": 3, "title": "C", "estimatedMinutes": 7, "unit": 1},
+            ],
+        }
+    )
+
+    def nxt(done: set[str]) -> str | None:
+        n = build_plan(NOW, SETTINGS, m, [], [], done).next_lesson
+        return n.id if n else None
+
+    assert nxt(set()) == "c"  # a hidden, b blocked by c
+    assert nxt({"c"}) == "b"
+    assert nxt({"c", "b"}) is None  # hidden lesson never suggested

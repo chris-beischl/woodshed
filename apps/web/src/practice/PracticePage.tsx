@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useCompleteLesson, usePlan, usePostReview } from "../api/client";
+import { Link } from "react-router";
+import { usePlan, usePostReview, type Plan } from "../api/client";
 import { useManifest } from "../content/useManifest";
 import { EXERCISE_COMPONENTS } from "../exercises/registry";
 import type { ExerciseOutcome } from "../exercises/types";
@@ -29,7 +30,6 @@ export function PracticePage() {
   const plan = usePlan();
   const manifest = useManifest();
   const postReview = usePostReview();
-  const completeLesson = useCompleteLesson();
   const [index, setIndex] = useState(0);
   const [results, setResults] = useState<CardResult[]>([]);
   const [streak, setStreak] = useState(0);
@@ -41,22 +41,11 @@ export function PracticePage() {
 
   const items = plan.data.items;
   const mismatch = plan.data.content_version !== manifest.data.version;
-  const firstLesson = manifest.data.lessons[0];
-
   if (items.length === 0) {
     return (
-      <div className="max-w-xl space-y-4">
+      <div className="max-w-xl space-y-6">
         <h1 className="display text-7xl">{t.practice.empty}</h1>
-        <p className="text-paper-dim">{t.practice.emptyHint}</p>
-        {firstLesson && (
-          <button
-            className="rounded-full bg-brass px-6 py-2.5 font-bold text-night hover:bg-brass-deep disabled:opacity-50"
-            disabled={completeLesson.isPending}
-            onClick={() => completeLesson.mutate(firstLesson.id)}
-          >
-            {t.practice.completeSampleLesson}
-          </button>
-        )}
+        {plan.data.next_lesson ? <NextLesson lesson={plan.data.next_lesson} /> : <p className="text-paper-dim">{t.practice.emptyHint}</p>}
       </div>
     );
   }
@@ -70,6 +59,7 @@ export function PracticePage() {
           <h1 className="display text-8xl">{t.practice.done}</h1>
           <p className="text-xl">{t.practice.doneSummary(clean, results.length)}</p>
           {plan.data.overflow > 0 && <p className="text-paper-dim">{t.practice.overflow(plan.data.overflow)}</p>}
+          {plan.data.next_lesson && <NextLesson lesson={plan.data.next_lesson} />}
         </div>
       </div>
     );
@@ -138,6 +128,19 @@ export function PracticePage() {
           {t.practice.saveError}
         </button>
       )}
+    </div>
+  );
+}
+
+function NextLesson({ lesson }: { lesson: NonNullable<Plan["next_lesson"]> }) {
+  return (
+    <div className="space-y-2 pt-4">
+      <p className="condensed text-lg text-paper-dim">{t.practice.nextLesson}</p>
+      <p className="condensed text-3xl font-bold">{lesson.title}</p>
+      <p className="text-paper-dim">{t.course.minutes(lesson.estimated_minutes)}</p>
+      <Link to={`/lektion/${lesson.id}`} className="inline-block rounded-full bg-brass px-6 py-2.5 font-bold text-night hover:bg-brass-deep">
+        {t.practice.startLesson}
+      </Link>
     </div>
   );
 }

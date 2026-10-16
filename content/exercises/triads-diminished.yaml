@@ -1,0 +1,13 @@
+id: triads-diminished
+type: play_chord
+title: "Verminderte Dreiklänge"
+tags: [triads, diminished]
+importance: 3
+targetSeconds: 6
+estimatedSeconds: 12
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "I:dim"
+voicing: any

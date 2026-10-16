@@ -16,6 +16,8 @@ def read_settings(db: DbDep) -> SettingsModel:
         desired_retention=row.desired_retention,
         timezone=row.timezone,
         day_rollover_hour=row.day_rollover_hour,
+        new_cards_per_day=row.new_cards_per_day,
+        keys_in_progress=row.keys_in_progress,
     )
 
 
@@ -27,5 +29,7 @@ def update_settings(body: SettingsModel, db: DbDep) -> SettingsModel:
     row.desired_retention = body.desired_retention
     row.timezone = body.timezone
     row.day_rollover_hour = body.day_rollover_hour
+    row.new_cards_per_day = body.new_cards_per_day
+    row.keys_in_progress = body.keys_in_progress
     db.commit()
     return body

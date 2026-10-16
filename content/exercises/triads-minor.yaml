@@ -11,4 +11,6 @@ prompt: { kind: symbol }
 response: { kind: play }
 chord: "i:m"
 voicing: any
+# A triad needs all three notes; the `any` preset alone would accept 1–3. (theory-decisions #12)
+constraints: { tones: { "5": required } }
 deprecated: false

@@ -24,6 +24,9 @@ class Lesson(BaseModel):
     title: str
     estimated_minutes: float = Field(alias="estimatedMinutes")
     introduces: list[str] = []
+    prerequisites: list[str] = []
+    hidden: bool = False
+    unit: int | None = None
 
 
 class Manifest(BaseModel):

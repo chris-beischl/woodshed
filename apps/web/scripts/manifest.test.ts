@@ -19,7 +19,7 @@ ${extra}
 
 const lesson = (id: string, introduces: string[], order = 1): SourceFile => ({
   path: `content/lessons/${id}.mdx`,
-  content: `---\nid: ${id}\ntitle: L\norder: ${order}\nestimatedMinutes: 10\nintroduces: [${introduces.join(", ")}]\n---\n\nBody`,
+  content: `---\nid: ${id}\ntitle: L\norder: ${order}\nunit: 1\nestimatedMinutes: 10\nintroduces: [${introduces.join(", ")}]\n---\n\nBody`,
 });
 
 function errorsOf(exercises: SourceFile[], lessons: SourceFile[] = []): string[] {
@@ -44,12 +44,12 @@ describe("buildManifest", () => {
   });
 
   it("restricts to an explicit key list", () => {
-    const m = buildManifest([template("a", 'chord: "I:maj"\nvoicing: any').content.replace("keys: all", "keys: [C, Gb]")].map((content) => ({ path: "x.yaml", content })), []);
+    const m = buildManifest([template("a", 'chord: "I:maj"\nvoicing: any').content.replace("keys: all", "keys: [C, Gb]")].map((content) => ({ path: "content/exercises/a.yaml", content })), []);
     expect(m.templates[0]!.keys).toEqual(["C", "Gb"]);
   });
 
   it("rejects spelling overflow: IV:dim7 in Gb is Cbdim7 with Bbbb", () => {
-    expect(errorsOf([template("a", 'chord: "IV:dim7"\nvoicing: any')]).join()).toMatch(/Gb: .*cannot be spelled/);
+    expect(errorsOf([template("a", 'chord: "IV:dim7"\nvoicing: any')]).join()).toMatch(/Gb IV:dim7: .*cannot be spelled/);
   });
 
   it("rejects presets that do not apply to the quality", () => {
@@ -61,14 +61,25 @@ describe("buildManifest", () => {
     expect(errors.join()).toMatch(/share a pitch class/);
   });
 
+  it("validates every chord of a progression in every key", () => {
+    const t = template("a", 'progression: ["I:maj", "IV:dim7"]\nvoicing: any');
+    const errors = errorsOf([{ ...t, content: t.content.replace("type: play_chord", "type: play_progression") }]);
+    expect(errors.join()).toMatch(/Gb IV:dim7/);
+  });
+
+  it("requires file name = id", () => {
+    expect(errorsOf([{ ...template("a", 'chord: "I:maj"\nvoicing: any'), path: "content/exercises/b.yaml" }])).toEqual([
+      'content/exercises/b.yaml: file name must equal id "a"',
+    ]);
+  });
+
   it("rejects bad numerals, unknown keys and broken references", () => {
     expect(errorsOf([template("a", 'chord: "VIII:7"\nvoicing: any')]).length).toBeGreaterThan(0);
-    expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any').content.replace("keys: all", "keys: [F#]")].map((content) => ({ path: "x.yaml", content })))).toHaveLength(1);
+    expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any').content.replace("keys: all", "keys: [F#]")].map((content) => ({ path: "content/exercises/a.yaml", content })))).toHaveLength(1);
     expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any')], [lesson("l", ["missing"])])).toEqual([
       "lesson l introduces unknown template missing",
     ]);
-    expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any'), template("a", 'chord: "I:maj"\nvoicing: any')])).toEqual([
-      "duplicate template id a",
-    ]);
+    const dup = template("a", 'chord: "I:maj"\nvoicing: any');
+    expect(errorsOf([dup, { ...dup, path: "content/exercises/sub/a.yaml" }])).toEqual(["duplicate template id a"]);
   });
 });

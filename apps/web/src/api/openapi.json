@@ -610,6 +610,29 @@
         ],
         "title": "LessonCompleteOut"
       },
+      "NextLessonOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "estimated_minutes": {
+            "type": "number",
+            "title": "Estimated Minutes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "estimated_minutes"
+        ],
+        "title": "NextLessonOut"
+      },
       "PlanItemOut": {
         "properties": {
           "card_id": {
@@ -652,6 +675,16 @@
             "type": "array",
             "title": "Items"
           },
+          "next_lesson": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NextLessonOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "overflow": {
             "type": "integer",
             "title": "Overflow"
@@ -668,6 +701,7 @@
         "type": "object",
         "required": [
           "items",
+          "next_lesson",
           "overflow",
           "remaining_seconds",
           "content_version"
@@ -829,6 +863,20 @@
             "maximum": 23.0,
             "minimum": 0.0,
             "title": "Day Rollover Hour",
+            "default": 4
+          },
+          "new_cards_per_day": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "New Cards Per Day",
+            "default": 10
+          },
+          "keys_in_progress": {
+            "type": "integer",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Keys In Progress",
             "default": 4
           }
         },

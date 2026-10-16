@@ -119,6 +119,13 @@ Lesson IDs are proposals; they become immutable once created.
 | **Tune** | rhythm changes A section (*Oleo*) | two hands | up-tempo swing |
 | **Tune** | *The Girl from Ipanema* changes (bossa with a tritone-sub turn) | two hands | bossa groove |
 
+## Status
+
+- **Unit 1 shipped (M2a)**: lessons `major-scale-degrees`, `triads`, `diatonic-triads`,
+  `cadences-voice-leading`, `pop-progression`. Still to come in unit 1: the lick
+  `lick-triad-cascade` and `lick-gospel-amen` (needs `play_lick`, M2b), *Amazing Grace*
+  with melody (needs melody + hand split, M3), and the grooves (M3).
+
 ## What has to be built (feeds `ARCHITECTURE.md § 10`)
 
 | Milestone | Features | Unlocks |

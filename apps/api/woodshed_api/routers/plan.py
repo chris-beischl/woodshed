@@ -2,9 +2,9 @@ from fastapi import APIRouter
 from sqlalchemy import select
 
 from woodshed_api.deps import DbDep, ManifestDep, NowDep, get_settings_row
-from woodshed_api.models import CardRow, ReviewLog
+from woodshed_api.models import CardRow, LessonProgress, ReviewLog
 from woodshed_api.planner import LogEntry, PlannerCard, PlannerSettings, build_plan
-from woodshed_api.schemas import PlanItemOut, PlanOut
+from woodshed_api.schemas import NextLessonOut, PlanItemOut, PlanOut
 
 router = APIRouter()
 
@@ -13,7 +13,13 @@ router = APIRouter()
 def get_plan(db: DbDep, manifest: ManifestDep, now: NowDep) -> PlanOut:
     s = get_settings_row(db)
     settings = PlannerSettings(
-        s.daily_minutes, s.new_card_ratio, s.desired_retention, s.timezone, s.day_rollover_hour
+        s.daily_minutes,
+        s.new_card_ratio,
+        s.desired_retention,
+        s.timezone,
+        s.day_rollover_hour,
+        s.new_cards_per_day,
+        s.keys_in_progress,
     )
     cards = [
         PlannerCard(c.id, c.template_id, c.key, c.fsrs_state, c.due, c.suspended)
@@ -21,11 +27,12 @@ def get_plan(db: DbDep, manifest: ManifestDep, now: NowDep) -> PlanOut:
     ]
     template_of = {c.id: c.template_id for c in cards}
     logs = [
-        LogEntry(r.ts, template_of[r.card_id], r.duration_ms, r.source)
+        LogEntry(r.ts, template_of[r.card_id], r.duration_ms, r.source, r.card_id)
         for r in db.scalars(select(ReviewLog))
         if r.card_id in template_of
     ]
-    plan = build_plan(now, settings, manifest, cards, logs)
+    completed = set(db.scalars(select(LessonProgress.lesson_id)))
+    plan = build_plan(now, settings, manifest, cards, logs, completed)
     db.commit()
     return PlanOut(
         items=[
@@ -38,6 +45,15 @@ def get_plan(db: DbDep, manifest: ManifestDep, now: NowDep) -> PlanOut:
             )
             for i in plan.items
         ],
+        next_lesson=(
+            NextLessonOut(
+                id=plan.next_lesson.id,
+                title=plan.next_lesson.title,
+                estimated_minutes=plan.next_lesson.estimated_minutes,
+            )
+            if plan.next_lesson
+            else None
+        ),
         overflow=plan.overflow,
         remaining_seconds=plan.remaining_seconds,
         content_version=manifest.version,

@@ -1,0 +1,13 @@
+id: triads-augmented
+type: play_chord
+title: "Übermäßige Dreiklänge"
+tags: [triads, augmented]
+importance: 2
+targetSeconds: 6
+estimatedSeconds: 12
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "I:aug"
+voicing: any
