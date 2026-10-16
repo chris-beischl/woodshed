@@ -37,7 +37,7 @@ Core loop:
 | Scheduling | `py-fsrs` (server-side only) |
 | Backend tests / lint | pytest, ruff, pyright |
 | JS package manager | pnpm |
-| Build tooling | `@vitejs/plugin-react`, `tsx` (runs scripts), `yaml` (content parsing), `openapi-typescript` (API types), `remark-frontmatter` (MDX ignores the YAML header; metadata comes from the manifest) |
+| Build tooling | `@vitejs/plugin-react`, `tsx` (runs scripts), `yaml` (content parsing), `openapi-typescript` (API types), `remark-frontmatter` + `remark-gfm` (MDX: skip the YAML header, render tables), `@mdx-js/mdx` (lesson compile test) |
 
 Do not add dependencies outside this list without stating why in the PR/commit message.
 JSON Schema export uses Zod 4's built-in `z.toJSONSchema()` — no extra library.

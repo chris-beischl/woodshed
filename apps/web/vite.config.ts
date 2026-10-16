@@ -3,9 +3,9 @@ import { resolve } from "node:path";
 import mdx from "@mdx-js/rollup";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import remarkFrontmatter from "remark-frontmatter";
 import type { Plugin } from "vite";
 import { defineConfig } from "vitest/config";
+import { mdxOptions } from "./mdx.config";
 
 const contentDir = resolve(import.meta.dirname, "../../content");
 
@@ -40,7 +40,7 @@ function watchContent(): Plugin {
 
 export default defineConfig({
   plugins: [
-    { enforce: "pre", ...mdx({ remarkPlugins: [remarkFrontmatter], providerImportSource: undefined }) },
+    { enforce: "pre", ...mdx(mdxOptions) },
     react({ include: /\.(mdx|tsx?)$/ }),
     tailwindcss(),
     watchContent(),
