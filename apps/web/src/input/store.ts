@@ -6,6 +6,7 @@ import { t } from "../ui/strings";
 
 const LAST_DEVICE = "woodshed.midiDevice";
 const SETTLE = "woodshed.settleMs";
+const RAPID_FIRE = "woodshed.rapidFire";
 
 function load(key: string): string | null {
   try {
@@ -35,6 +36,9 @@ interface InputState {
   settleMs: number;
   connectMidi(): Promise<void>;
   setSettleMs(ms: number): void;
+  /** Skip "Next" after a clean attempt (per-viewer convenience). */
+  rapidFire: boolean;
+  setRapidFire(on: boolean): void;
 }
 
 /** All sources feed one stream; evaluation never knows where notes came from. */
@@ -87,6 +91,11 @@ export const useInput = create<InputState>((set, get) => {
     setSettleMs(ms) {
       save(SETTLE, String(ms));
       set({ settleMs: ms });
+    },
+    rapidFire: load(RAPID_FIRE) === "1",
+    setRapidFire(on) {
+      save(RAPID_FIRE, on ? "1" : "0");
+      set({ rapidFire: on });
     },
   };
 });

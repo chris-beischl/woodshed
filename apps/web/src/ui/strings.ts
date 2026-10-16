@@ -71,6 +71,8 @@ const de = {
     device: "Gerät",
     sustain: "Pedal",
     virtualHint: "Ohne Klavier: Tasten A bis K spielen C4–C5, ein Klick hält eine Taste fest.",
+    rapidFire: "Schnellfeuer",
+    rapidFireHint: "Nach einem fehlerfreien Versuch geht es ohne Klick direkt weiter.",
   },
   exercise: {
     play: "Spiele",
@@ -208,6 +210,8 @@ const en: typeof de = {
     device: "Device",
     sustain: "Pedal",
     virtualHint: "No piano? Keys A to K play C4–C5; a click holds a key down.",
+    rapidFire: "Rapid fire",
+    rapidFireHint: "After a clean attempt, move on to the next one without clicking.",
   },
   exercise: {
     play: "Play",

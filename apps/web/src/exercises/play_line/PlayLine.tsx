@@ -9,6 +9,7 @@ import { displayKey, displayNote } from "../../ui/music";
 import { t } from "../../ui/strings";
 import { playLineParams } from "../schema";
 import type { ExerciseProps } from "../types";
+import { useAdvance } from "../useAdvance";
 import { loadBest, saveBest } from "../chords/best";
 import { resolvePlayLine } from "./resolve";
 
@@ -69,6 +70,26 @@ export function PlayLine({ template, keyToken, onSubmit }: ExerciseProps) {
   const computed = done
     ? gradeAttempt({ chords: [{ mistakes, failed: !success }], durationMs, targetSeconds: template.targetSeconds, abandoned })
     : null;
+
+  const advance = useAdvance(clean, () => {
+    if (!computed) return;
+    onSubmit({
+      rating: override ?? computed,
+      durationMs: Math.round(durationMs),
+      attempts: mistakes + (success ? 1 : 0),
+      clean,
+      details: {
+        type: "play_line",
+        key: keyToken,
+        computedRating: computed,
+        overridden: override !== null && override !== computed,
+        abandoned,
+        mistakes,
+        wrong: state?.wrong ?? [],
+        played: state?.played ?? [],
+      },
+    });
+  });
 
   return (
     <div className="space-y-8">
@@ -139,24 +160,7 @@ export function PlayLine({ template, keyToken, onSubmit }: ExerciseProps) {
             <button
               autoFocus
               className="rounded-full bg-brass px-7 py-2.5 font-bold text-night hover:bg-brass-deep"
-              onClick={() =>
-                onSubmit({
-                  rating: override ?? computed,
-                  durationMs: Math.round(durationMs),
-                  attempts: mistakes + (success ? 1 : 0),
-                  clean,
-                  details: {
-                    type: "play_line",
-                    key: keyToken,
-                    computedRating: computed,
-                    overridden: override !== null && override !== computed,
-                    abandoned,
-                    mistakes,
-                    wrong: state?.wrong ?? [],
-                    played: state?.played ?? [],
-                  },
-                })
-              }
+              onClick={advance}
             >
               {t.exercise.next}
             </button>

@@ -15,6 +15,7 @@ import { t } from "../../ui/strings";
 import type { PlayChordInstance } from "../play_chord/resolve";
 import type { ManifestTemplate } from "../schema";
 import type { ExerciseOutcome } from "../types";
+import { useAdvance } from "../useAdvance";
 import { loadBest, saveBest } from "./best";
 
 // VexFlow is large and only needed after an attempt.
@@ -111,13 +112,16 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
     return "idle";
   }
 
+  const clean = done && !abandoned && allCorrect && totalMistakes === 0;
+  const advance = useAdvance(clean, submit);
+
   function submit() {
     if (!computed) return;
     onSubmit({
       rating: override ?? computed,
       durationMs: Math.round(durationMs),
       attempts: totalMistakes + progress.filter((c) => c.correct).length,
-      clean: !abandoned && allCorrect && totalMistakes === 0,
+      clean,
       details: {
         type: template.type,
         key: keyToken,
@@ -228,7 +232,7 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
                 </button>
               ))}
             </div>
-            <button onClick={submit} autoFocus className="rounded-full bg-brass px-7 py-2.5 font-bold text-night hover:bg-brass-deep">
+            <button onClick={advance} autoFocus className="rounded-full bg-brass px-7 py-2.5 font-bold text-night hover:bg-brass-deep">
               {t.exercise.next}
             </button>
           </div>

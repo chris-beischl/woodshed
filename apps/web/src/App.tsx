@@ -29,6 +29,20 @@ function MidiPicker() {
   );
 }
 
+function RapidFireToggle() {
+  const { rapidFire, setRapidFire } = useInput();
+  return (
+    <button
+      onClick={() => setRapidFire(!rapidFire)}
+      aria-pressed={rapidFire}
+      title={t.input.rapidFireHint}
+      className={`rounded-full border px-4 py-1.5 text-sm ${rapidFire ? "border-brass bg-brass font-bold text-night" : "border-paper/40 hover:border-paper"}`}
+    >
+      ⚡ {t.input.rapidFire}
+    </button>
+  );
+}
+
 export function App() {
   const link = ({ isActive }: { isActive: boolean }) =>
     `condensed text-lg ${isActive ? "text-paper underline decoration-brass decoration-2 underline-offset-8" : "text-paper-dim hover:text-paper"}`;
@@ -44,6 +58,7 @@ export function App() {
           <NavLink to="/dev" className={link}>{t.nav.dev}</NavLink>
         </nav>
         <div className="flex items-center gap-4">
+          <RapidFireToggle />
           <MidiPicker />
           <div className="flex gap-1 text-sm" role="group" aria-label={t.language}>
             {LANGS.map((l) => (

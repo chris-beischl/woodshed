@@ -7,6 +7,7 @@ import { displayKey, displayNote } from "../../ui/music";
 import { t } from "../../ui/strings";
 import { choiceParams } from "../schema";
 import type { ExerciseProps } from "../types";
+import { useAdvance } from "../useAdvance";
 import { makeQuiz, seededRandom, type Question } from "./quiz";
 
 function isCorrect(q: Question, option: number): boolean {
@@ -67,6 +68,16 @@ export function DegreeQuiz({ template, keyToken, onSubmit }: ExerciseProps) {
 
   const durationMs = (finishedAt.current ?? performance.now()) - started.current;
   const computed = done ? gradeQuiz({ mistakes, rounds: questions.length, durationMs, targetSeconds: template.targetSeconds }) : null;
+  const advance = useAdvance(done && mistakes === 0, () => {
+    if (!computed) return;
+    onSubmit({
+      rating: override ?? computed,
+      durationMs: Math.round(durationMs),
+      attempts: questions.length,
+      clean: mistakes === 0,
+      details: { type: "choice", key: keyToken, ask: params.ask, seed, mistakes, rounds: questions.length, computedRating: computed },
+    });
+  });
 
   if (done && computed) {
     return (
@@ -92,15 +103,7 @@ export function DegreeQuiz({ template, keyToken, onSubmit }: ExerciseProps) {
           <button
             autoFocus
             className="rounded-full bg-brass px-7 py-2.5 font-bold text-night hover:bg-brass-deep"
-            onClick={() =>
-              onSubmit({
-                rating: override ?? computed,
-                durationMs: Math.round(durationMs),
-                attempts: questions.length,
-                clean: mistakes === 0,
-                details: { type: "choice", key: keyToken, ask: params.ask, seed, mistakes, rounds: questions.length, computedRating: computed },
-              })
-            }
+            onClick={advance}
           >
             {t.exercise.next}
           </button>

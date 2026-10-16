@@ -3,6 +3,7 @@ import { usePostReview } from "../progress/client";
 import { playChords } from "../audio/player";
 import { useManifest } from "../content/useManifest";
 import { EXERCISE_COMPONENTS } from "../exercises/registry";
+import { useInput } from "../input/store";
 import type { ExerciseOutcome } from "../exercises/types";
 import { chordTones } from "../theory/chords";
 import { keyToken, parseKeyName, type Mode } from "../theory/keys";
@@ -77,13 +78,16 @@ export function Exercise({ id, keyName, startToken }: { id: string; keyName?: st
   const startIndex = template && token0 ? Math.max(0, template.keys.indexOf(token0)) : 0;
   const [offset, setOffset] = useState(0);
   const [result, setResult] = useState<ExerciseOutcome | null>(null);
+  const rapidFire = useInput((s) => s.rapidFire);
 
   if (!template) return <p className="text-signal">Unknown exercise {id}</p>;
   const Component = EXERCISE_COMPONENTS[template.type];
   const token = template.keys[(startIndex + offset) % template.keys.length]!;
 
   function submit(o: ExerciseOutcome) {
-    setResult(o);
+    // Rapid fire: the exercise already showed its result, go straight to the next key.
+    if (rapidFire && o.clean) setOffset((n) => n + 1);
+    else setResult(o);
     postReview.mutate({ card_id: `${template!.id}@${token}`, rating: o.rating, duration_ms: o.durationMs, source: "lesson" });
   }
 
