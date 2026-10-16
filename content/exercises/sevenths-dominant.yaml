@@ -1,0 +1,15 @@
+id: sevenths-dominant
+type: play_chord
+title:
+  de: "Dominantseptakkorde (7)"
+  en: "Dominant seventh chords (7)"
+tags: [seventh-chords, dominant]
+importance: 5
+targetSeconds: 8
+estimatedSeconds: 15
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "I:7"
+voicing: root_position

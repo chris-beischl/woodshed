@@ -1,0 +1,15 @@
+id: andalusian-cadence
+type: play_progression
+title:
+  de: "Andalusische Kadenz i–♭VII–♭VI–V"
+  en: "Andalusian cadence i–♭VII–♭VI–V"
+tags: [minor, flamenco, triads, voice-leading]
+importance: 3
+targetSeconds: 12
+estimatedSeconds: 24
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["i:m", "bVII:maj", "bVI:maj", "V:maj"]
+voicing: any

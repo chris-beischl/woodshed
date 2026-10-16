@@ -9,7 +9,7 @@ const manifest = {
     { id: "triads-major", keys: ["C", "F"], deprecated: false, importance: 5, estimatedSeconds: 10 },
     { id: "old", keys: ["C"], deprecated: true, importance: 1, estimatedSeconds: 10 },
   ],
-  lessons: [{ id: "intro", order: 1, title: "Intro", estimatedMinutes: 5, unit: 1, introduces: ["triads-major", "old"], prerequisites: [], hidden: false }],
+  lessons: [{ id: "intro", order: 1, title: { de: "Intro", en: "Intro" }, estimatedMinutes: 5, unit: 1, introduces: ["triads-major", "old"], prerequisites: [], hidden: false }],
 } as unknown as Manifest; // only the fields the planner reads
 
 describe("learner state", () => {

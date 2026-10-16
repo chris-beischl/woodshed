@@ -1,3 +1,4 @@
+import { t } from "./strings";
 import type { Quality } from "../theory/chords";
 import type { SpelledNote } from "../theory/note";
 
@@ -28,7 +29,7 @@ export function displayNumeral(numeral: string): string {
 }
 
 export function displayKey(key: { tonic: SpelledNote; mode: "major" | "minor" }): string {
-  return displayNote(key.tonic) + (key.mode === "minor" ? "-Moll" : "-Dur");
+  return t.keyName(displayNote(key.tonic), key.mode);
 }
 
 /** Degree tokens for feedback text: "b7" → "♭7". */

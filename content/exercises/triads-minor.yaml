@@ -1,6 +1,8 @@
 id: triads-minor
 type: play_chord
-title: "Moll-Dreiklänge"
+title:
+  de: "Moll-Dreiklänge"
+  en: "Minor triads"
 tags: [triads, minor]
 importance: 4
 targetSeconds: 6

@@ -1,0 +1,15 @@
+id: sevenths-minor
+type: play_chord
+title:
+  de: "Moll-Septakkorde (m7)"
+  en: "Minor seventh chords (m7)"
+tags: [seventh-chords, minor]
+importance: 4
+targetSeconds: 8
+estimatedSeconds: 15
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "i:m7"
+voicing: root_position

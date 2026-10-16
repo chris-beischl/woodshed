@@ -1,0 +1,15 @@
+id: ii-v-i-major
+type: play_progression
+title:
+  de: "ii–V–I in Dur"
+  en: "Major ii–V–I"
+tags: [jazz, ii-v-i, seventh-chords, voice-leading]
+importance: 5
+targetSeconds: 9
+estimatedSeconds: 18
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["ii:m7", "V:7", "I:maj7"]
+voicing: any

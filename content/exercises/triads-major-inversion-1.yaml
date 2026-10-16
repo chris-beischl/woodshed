@@ -1,0 +1,15 @@
+id: triads-major-inversion-1
+type: play_chord
+title:
+  de: "Dur-Dreiklänge in 1. Umkehrung (Terz im Bass)"
+  en: "Major triads, 1st inversion (third in the bass)"
+tags: [triads, major, inversions]
+importance: 3
+targetSeconds: 8
+estimatedSeconds: 15
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "I:maj"
+voicing: inversion_1

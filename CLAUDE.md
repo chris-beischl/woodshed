@@ -141,9 +141,11 @@ the user is by definition not yet able to spot it. Therefore:
 ## Conventions
 
 - Code, identifiers, comments, commit messages: English.
-- UI text and lesson content: German by default (jazz terminology stays English:
-  "Shell Voicing", "Guide Tones", "ii–V–I"). Keep UI strings in one place so this can
-  change later.
+- The UI is bilingual, German and English (jazz terminology stays English in both:
+  "Shell Voicing", "Guide Tones", "ii–V–I"). UI strings live in `src/ui/strings.ts`
+  (`de` is the reference, `en` must match its type). Content titles are `{ de, en }`;
+  every lesson has a German `<id>.mdx` (with frontmatter) and an English body
+  `<id>.en.mdx`. The manifest build fails if a translation is missing.
 - TypeScript `strict: true`. No `any` in `theory/` or `evaluation/`.
 - Small, focused commits. Each milestone in `ARCHITECTURE.md` ends with passing tests,
   typecheck and lint.

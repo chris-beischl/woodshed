@@ -153,7 +153,14 @@ function duplicates(ids: string[]): string[] {
 export function buildManifest(exercises: SourceFile[], lessons: SourceFile[]): Manifest {
   const errors: string[] = [];
   const templates = exercises.map((f) => parseTemplate(f, errors)).filter((t) => t !== null);
+  // `<id>.mdx` is the German lesson (with frontmatter); `<id>.en.mdx` its English body.
+  const isEnglish = (f: SourceFile) => f.path.endsWith(".en.mdx");
+  const english = new Set(lessons.filter(isEnglish).map((f) => f.path.replace(/\.en\.mdx$/, ".mdx")));
+  for (const f of lessons) {
+    if (!isEnglish(f) && !english.has(f.path)) errors.push(`${f.path}: missing English version ${f.path.replace(/\.mdx$/, ".en.mdx")}`);
+  }
   const lessonList = lessons
+    .filter((f) => !isEnglish(f))
     .map((f) => parseLesson(f, errors))
     .filter((l) => l !== null)
     .sort((a, b) => a.order - b.order);

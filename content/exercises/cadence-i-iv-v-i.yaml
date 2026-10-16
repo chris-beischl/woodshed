@@ -1,6 +1,8 @@
 id: cadence-i-iv-v-i
 type: play_progression
-title: "Kadenz I–IV–V–I mit kurzen Wegen"
+title:
+  de: "Kadenz I–IV–V–I mit kurzen Wegen"
+  en: "Cadence I–IV–V–I with short moves"
 tags: [cadence, voice-leading, triads]
 importance: 5
 targetSeconds: 10

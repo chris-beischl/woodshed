@@ -8,6 +8,7 @@ import type { NoteEvent } from "../input/types";
 import { parseKeyToken } from "../theory/keys";
 import { displayKey } from "../ui/music";
 import { t } from "../ui/strings";
+import { loc } from "../ui/i18n";
 
 /** Capture tuning, recorder/replay and free play without touching the schedule. */
 export function DevPage() {
@@ -93,7 +94,7 @@ export function DevPage() {
           <select value={templateId} onChange={(e) => setTemplateId(e.target.value)} className="rounded-full border border-night-3 bg-night-2 px-3 py-1.5">
             <option value="">{t.dev.template} …</option>
             {manifest.data?.templates.map((tpl) => (
-              <option key={tpl.id} value={tpl.id}>{tpl.title}</option>
+              <option key={tpl.id} value={tpl.id}>{loc(tpl.title)}</option>
             ))}
           </select>
           {template && (

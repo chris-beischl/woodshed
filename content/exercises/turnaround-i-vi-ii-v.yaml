@@ -1,0 +1,15 @@
+id: turnaround-i-vi-ii-v
+type: play_progression
+title:
+  de: "Turnaround I–vi–ii–V"
+  en: "Turnaround I–vi–ii–V"
+tags: [jazz, turnaround, seventh-chords, voice-leading]
+importance: 4
+targetSeconds: 12
+estimatedSeconds: 24
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["I:maj7", "vi:m7", "ii:m7", "V:7"]
+voicing: any

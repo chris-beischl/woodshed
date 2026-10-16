@@ -1,0 +1,16 @@
+id: sevenths-half-diminished
+type: play_chord
+title:
+  de: "Halbverminderte Septakkorde (m7♭5)"
+  en: "Half-diminished seventh chords (m7♭5)"
+tags: [seventh-chords, half-diminished]
+importance: 3
+targetSeconds: 8
+estimatedSeconds: 15
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: minor key set (G#, C#, F#), so roots avoid Abm7b5 = Ab-Cb-Ebb-Gb. (theory-decisions #14)
+chord: "i:m7b5"
+voicing: root_position

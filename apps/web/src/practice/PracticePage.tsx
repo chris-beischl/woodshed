@@ -8,6 +8,7 @@ import { parseKeyToken } from "../theory/keys";
 import { pitchClass } from "../theory/note";
 import { KeyCircle, type KeyResult } from "../ui/KeyCircle";
 import { t } from "../ui/strings";
+import { loc } from "../ui/i18n";
 
 interface CardResult {
   pc: number;
@@ -105,7 +106,7 @@ export function PracticePage() {
         {streak >= 2 && <span className="condensed rounded-full bg-sage px-3 py-0.5 font-bold text-night">{t.practice.streak(streak)}</span>}
       </div>
 
-      {template && <p className="condensed -mb-6 text-lg text-brass">{template.title}</p>}
+      {template && <p className="condensed -mb-6 text-lg text-brass">{loc(template.title)}</p>}
       {Exercise && template ? (
         // key = card id: each card gets fresh exercise state.
         <Exercise key={item.card_id} template={template} keyToken={item.key} onSubmit={save} />
@@ -126,7 +127,7 @@ function NextLesson({ lesson }: { lesson: NonNullable<Plan["next_lesson"]> }) {
   return (
     <div className="space-y-2 pt-4">
       <p className="condensed text-lg text-paper-dim">{t.practice.nextLesson}</p>
-      <p className="condensed text-3xl font-bold">{lesson.title}</p>
+      <p className="condensed text-3xl font-bold">{loc(lesson.title)}</p>
       <p className="text-paper-dim">{t.course.minutes(lesson.estimatedMinutes)}</p>
       <Link to={`/lektion/${lesson.id}`} className="inline-block rounded-full bg-brass px-6 py-2.5 font-bold text-night hover:bg-brass-deep">
         {t.practice.startLesson}

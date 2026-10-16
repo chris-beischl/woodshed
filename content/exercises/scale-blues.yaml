@@ -1,0 +1,19 @@
+id: scale-blues
+type: play_line
+title:
+  de: "Blues-Tonleiter"
+  en: "Blues scale"
+tags: [scales, blues]
+importance: 3
+targetSeconds: 7
+estimatedSeconds: 20
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: the blue note is spelled b5 (C blues: Gb), not #11/#4. (theory-decisions #13)
+ref: key
+notes: ["1", "b3", "4", "b5", "5", "b7", "1", "b7", "5", "b5", "4", "b3", "1"]
+contour: [1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1]
+onMistake: retry
+maxMistakes: 4

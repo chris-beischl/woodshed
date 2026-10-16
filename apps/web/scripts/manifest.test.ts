@@ -5,7 +5,7 @@ const template = (id: string, extra: string, mode = "major"): SourceFile => ({
   path: `content/exercises/${id}.yaml`,
   content: `id: ${id}
 type: play_chord
-title: T
+title: { de: T, en: T }
 importance: 3
 targetSeconds: 5
 estimatedSeconds: 10
@@ -19,8 +19,9 @@ ${extra}
 
 const lesson = (id: string, introduces: string[], order = 1): SourceFile => ({
   path: `content/lessons/${id}.mdx`,
-  content: `---\nid: ${id}\ntitle: L\norder: ${order}\nunit: 1\nestimatedMinutes: 10\nintroduces: [${introduces.join(", ")}]\n---\n\nBody`,
+  content: `---\nid: ${id}\ntitle: { de: L, en: L }\norder: ${order}\nunit: 1\nestimatedMinutes: 10\nintroduces: [${introduces.join(", ")}]\n---\n\nBody`,
 });
+const english = (id: string): SourceFile => ({ path: `content/lessons/${id}.en.mdx`, content: "Body" });
 
 function errorsOf(exercises: SourceFile[], lessons: SourceFile[] = []): string[] {
   try {
@@ -36,7 +37,7 @@ describe("buildManifest", () => {
   it("builds a valid manifest with key tokens in introduction order", () => {
     const m = buildManifest(
       [template("a", 'chord: "V:7"\nvoicing: root_position'), template("b", 'chord: "i:m"\nvoicing: any', "minor")],
-      [lesson("l", ["a", "b"])],
+      [lesson("l", ["a", "b"]), english("l")],
     );
     expect(m.templates.find((t) => t.id === "a")!.keys).toEqual(["C", "F", "Bb", "Eb", "Ab", "Db", "Gb", "B", "E", "A", "D", "G"]);
     expect(m.templates.find((t) => t.id === "b")!.keys).toEqual(["C", "F", "Bb", "Eb", "Gs", "Cs", "Fs", "B", "E", "A", "D", "G"]);
@@ -76,9 +77,10 @@ describe("buildManifest", () => {
   it("rejects bad numerals, unknown keys and broken references", () => {
     expect(errorsOf([template("a", 'chord: "VIII:7"\nvoicing: any')]).length).toBeGreaterThan(0);
     expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any').content.replace("keys: all", "keys: [F#]")].map((content) => ({ path: "content/exercises/a.yaml", content })))).toHaveLength(1);
-    expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any')], [lesson("l", ["missing"])])).toEqual([
+    expect(errorsOf([template("a", 'chord: "I:maj"\nvoicing: any')], [lesson("l", ["missing"]), english("l")])).toEqual([
       "lesson l introduces unknown template missing",
     ]);
+    expect(errorsOf([], [lesson("l", [])])).toEqual(["content/lessons/l.mdx: missing English version content/lessons/l.en.mdx"]);
     const dup = template("a", 'chord: "I:maj"\nvoicing: any');
     expect(errorsOf([dup, { ...dup, path: "content/exercises/sub/a.yaml" }])).toEqual(["duplicate template id a"]);
   });

@@ -26,7 +26,7 @@ const BIG = settings({ daily_minutes: 600, new_card_ratio: 1, new_cards_per_day:
 const tpl = (id: string, importance: number, keys: string[], deprecated = false): ManifestTemplate => ({
   id,
   type: "play_chord",
-  title: id,
+  title: { de: id, en: id },
   tags: [],
   importance,
   targetSeconds: 8,
@@ -40,7 +40,7 @@ const tpl = (id: string, importance: number, keys: string[], deprecated = false)
 });
 const lesson = (id: string, order: number, o: Partial<Lesson> = {}): Lesson => ({
   id,
-  title: id,
+  title: { de: id, en: id },
   order,
   estimatedMinutes: 10,
   unit: 1,

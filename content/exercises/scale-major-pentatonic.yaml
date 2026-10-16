@@ -1,0 +1,18 @@
+id: scale-major-pentatonic
+type: play_line
+title:
+  de: "Dur-Pentatonik"
+  en: "Major pentatonic"
+tags: [scales, major, pentatonic]
+importance: 3
+targetSeconds: 6
+estimatedSeconds: 20
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+ref: key
+notes: ["1", "2", "3", "5", "6", "1", "6", "5", "3", "2", "1"]
+contour: [1, 1, 1, 1, 1, -1, -1, -1, -1, -1]
+onMistake: retry
+maxMistakes: 4

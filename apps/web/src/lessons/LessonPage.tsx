@@ -5,6 +5,7 @@ import { useManifest } from "../content/useManifest";
 import { t } from "../ui/strings";
 import { lessonComponents } from "./components";
 import { lessonModule } from "./registry";
+import { loc } from "../ui/i18n";
 
 export function LessonPage() {
   const { id = "" } = useParams();
@@ -27,7 +28,7 @@ export function LessonPage() {
         <p className="condensed text-xl text-brass">
           <Link to="/kurs" className="hover:underline">{t.course.unit(lesson.unit)}</Link>
         </p>
-        <h1 className="display text-[clamp(3.5rem,9vw,6.5rem)]">{lesson.title}</h1>
+        <h1 className="display text-[clamp(3.5rem,9vw,6.5rem)]">{loc(lesson.title)}</h1>
         <p className="text-paper-dim">{t.course.minutes(lesson.estimatedMinutes)}</p>
       </header>
 

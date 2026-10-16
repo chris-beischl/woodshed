@@ -1,6 +1,8 @@
 id: pop-i-v-vi-iv
 type: play_progression
-title: "Die Pop-Progression I–V–vi–IV"
+title:
+  de: "Die Pop-Progression I–V–vi–IV"
+  en: "The pop progression I–V–vi–IV"
 tags: [pop, tune, triads, voice-leading]
 importance: 4
 targetSeconds: 10

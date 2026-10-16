@@ -1,6 +1,8 @@
 id: triads-major
 type: play_chord
-title: "Dur-Dreiklänge"
+title:
+  de: "Dur-Dreiklänge"
+  en: "Major triads"
 tags: [triads, major]
 importance: 4
 targetSeconds: 6

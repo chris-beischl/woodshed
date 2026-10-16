@@ -1,6 +1,8 @@
 id: diatonic-triads-ladder
 type: play_progression
-title: "Die Stufenleiter: alle Dreiklänge einer Tonart"
+title:
+  de: "Die Stufenleiter: alle Dreiklänge einer Tonart"
+  en: "The ladder: every triad of a key"
 tags: [triads, diatonic, roman]
 importance: 4
 targetSeconds: 20

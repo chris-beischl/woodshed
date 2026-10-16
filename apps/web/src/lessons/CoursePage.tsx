@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { useProgress } from "../progress/client";
 import { useManifest } from "../content/useManifest";
 import { t } from "../ui/strings";
+import { loc } from "../ui/i18n";
 
 /** Course overview: units in order, lessons with their status. */
 export function CoursePage() {
@@ -33,7 +34,7 @@ export function CoursePage() {
                   <li key={l.id}>
                     <Link to={`/lektion/${l.id}`} className="flex items-baseline gap-4 py-4 hover:bg-night-2">
                       <span className={`h-3 w-3 shrink-0 rounded-full ${done ? "bg-sage" : ready ? "border-2 border-brass" : "border-2 border-night-3"}`} aria-hidden />
-                      <span className={`condensed flex-1 text-2xl font-bold ${ready || done ? "" : "text-paper-dim"}`}>{l.title}</span>
+                      <span className={`condensed flex-1 text-2xl font-bold ${ready || done ? "" : "text-paper-dim"}`}>{loc(l.title)}</span>
                       <span className="text-sm text-paper-dim">
                         {done ? t.course.done : ready ? t.course.minutes(l.estimatedMinutes) : t.course.locked}
                       </span>

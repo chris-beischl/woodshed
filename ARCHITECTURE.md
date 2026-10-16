@@ -321,7 +321,7 @@ M1 types: `play_chord`. M2: `play_progression`, `choice_notation`, `name_chord`.
 ```yaml
 id: ii-V-I-shell              # immutable, kebab-case
 type: play_progression
-title: "ii–V–I mit Shell Voicings"
+title: { de: "ii–V–I mit Shell Voicings", en: "ii–V–I with shell voicings" }
 tags: [ii-V-I, shell, major]
 importance: 5                  # 1–5, used by the planner
 targetSeconds: 20
@@ -376,7 +376,7 @@ every key. Scales use `ref: key`; licks usually `ref: chord`.
 ```yaml
 id: lick-enclosure-3
 type: play_line
-title: "Enclosure auf die Terz"
+title: { de: "Enclosure auf die Terz", en: "Enclosure onto the third" }
 mode: major
 keys: all
 prompt: { kind: notation }      # staff + chord symbol; "audio" = call & response (M2b)
@@ -417,7 +417,7 @@ Build-time validation: every token spells within `-2..2` in every key, `contour`
 ```mdx
 ---
 id: shell-voicings-intro
-title: Shell Voicings
+title: { de: Shell Voicings, en: Shell Voicings }
 order: 3
 estimatedMinutes: 25
 introduces: [shell-maj7, shell-m7, shell-dom7]
@@ -435,7 +435,14 @@ MDX components (grow as needed): `ChordDemo` (notation + on-screen keyboard +
 playback), `Keyboard`, `Notation`, `Exercise` (renders a template instance inline),
 `Callout`.
 
-**Lesson completion** (`POST /lessons/{id}/complete`) creates all cards of the
+**Languages**: `<id>.mdx` holds the frontmatter and the German body; `<id>.en.mdx` the
+English body only (no frontmatter). The app loads the file for the UI language; the
+manifest build fails if a lesson has no English body.
+
+**Free practice** (`/frei`) offers every non-deprecated template in any key without a
+lesson. Its attempts are logged like in-lesson attempts (no FSRS update).
+
+**Lesson completion** (`completeLesson`, § 8.2) creates all cards of the
 `introduces` templates in state `new`. In-lesson exercise attempts are logged with
 `source: "lesson"` but do not update FSRS state; their `card_id` need not exist yet
 (the lesson runs before its cards are created).

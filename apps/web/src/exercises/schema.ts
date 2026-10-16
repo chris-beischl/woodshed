@@ -4,6 +4,8 @@ import { PRESETS } from "../evaluation/types";
 
 const kebab = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "must be kebab-case");
 const degree = z.enum(DEGREE_TOKENS as [DegreeToken, ...DegreeToken[]]);
+/** Every user-facing content string exists in each UI language (src/ui/i18n.ts). */
+const localized = z.object({ de: z.string().min(1), en: z.string().min(1) }).strict();
 
 /** Overrides of the resolved ChordSpec (template `constraints:` block). */
 export const constraintsSchema = z
@@ -72,7 +74,7 @@ export const EXERCISE_TYPES = Object.keys(PARAM_SCHEMAS) as [ExerciseType, ...Ex
 export const templateBaseSchema = z.object({
   id: kebab,
   type: z.enum(EXERCISE_TYPES),
-  title: z.string().min(1),
+  title: localized,
   tags: z.array(z.string()).default([]),
   importance: z.number().int().min(1).max(5),
   targetSeconds: z.number().positive(),
@@ -87,7 +89,7 @@ export const templateBaseSchema = z.object({
 export const lessonFrontmatterSchema = z
   .object({
     id: kebab,
-    title: z.string().min(1),
+    title: localized,
     order: z.number().int().nonnegative(),
     estimatedMinutes: z.number().positive(),
     unit: z.number().int().min(1).max(6),

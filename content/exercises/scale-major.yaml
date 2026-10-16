@@ -1,6 +1,8 @@
 id: scale-major
 type: play_line
-title: "Dur-Tonleiter, eine Oktave auf und ab"
+title:
+  de: "Dur-Tonleiter, eine Oktave auf und ab"
+  en: "Major scale, one octave up and down"
 tags: [scales, major]
 importance: 4
 targetSeconds: 8

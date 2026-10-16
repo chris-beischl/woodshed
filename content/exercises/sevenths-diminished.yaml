@@ -1,0 +1,16 @@
+id: sevenths-diminished
+type: play_chord
+title:
+  de: "Verminderte Septakkorde (°7)"
+  en: "Diminished seventh chords (°7)"
+tags: [seventh-chords, diminished]
+importance: 3
+targetSeconds: 8
+estimatedSeconds: 15
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: minor key set (G#, C#, F#), so roots avoid Gb°7 = Gb-Bbb-Dbb-Fbb. (theory-decisions #14)
+chord: "i:dim7"
+voicing: root_position

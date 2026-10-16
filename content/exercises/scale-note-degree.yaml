@@ -1,6 +1,8 @@
 id: scale-note-degree
 type: choice
-title: "Stufen-Sprint: Welche Stufe?"
+title:
+  de: "Stufen-Sprint: Welche Stufe?"
+  en: "Degree sprint: which degree?"
 tags: [scales, degrees]
 importance: 3
 targetSeconds: 24

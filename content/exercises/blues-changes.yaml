@@ -1,0 +1,15 @@
+id: blues-changes
+type: play_progression
+title:
+  de: "12-Takt-Blues, Akkordwechsel verdichtet"
+  en: "12-bar blues changes (condensed)"
+tags: [blues, dominant, voice-leading]
+importance: 4
+targetSeconds: 18
+estimatedSeconds: 36
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["I:7", "IV:7", "I:7", "V:7", "IV:7", "I:7"]
+voicing: any

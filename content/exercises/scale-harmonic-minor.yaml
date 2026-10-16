@@ -1,0 +1,18 @@
+id: scale-harmonic-minor
+type: play_line
+title:
+  de: "Harmonisch Moll, eine Oktave auf und ab"
+  en: "Harmonic minor, one octave up and down"
+tags: [scales, minor]
+importance: 3
+targetSeconds: 8
+estimatedSeconds: 20
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+ref: key
+notes: ["1", "2", "b3", "4", "5", "b13", "7", "1", "7", "b13", "5", "4", "b3", "2", "1"]
+contour: [1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1]
+onMistake: retry
+maxMistakes: 4

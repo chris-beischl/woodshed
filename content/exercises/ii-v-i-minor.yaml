@@ -1,0 +1,16 @@
+id: ii-v-i-minor
+type: play_progression
+title:
+  de: "ii–V–i in Moll"
+  en: "Minor ii–V–i"
+tags: [jazz, ii-v-i, seventh-chords, minor, voice-leading]
+importance: 4
+targetSeconds: 9
+estimatedSeconds: 18
+mode: minor
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: the minor tonic is m7; m6 and m(maj7) are common alternatives. (theory-decisions #15)
+progression: ["ii:m7b5", "V:7", "i:m7"]
+voicing: any

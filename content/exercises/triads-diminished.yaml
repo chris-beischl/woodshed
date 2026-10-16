@@ -1,6 +1,8 @@
 id: triads-diminished
 type: play_chord
-title: "Verminderte Dreiklänge"
+title:
+  de: "Verminderte Dreiklänge"
+  en: "Diminished triads"
 tags: [triads, diminished]
 importance: 3
 targetSeconds: 6

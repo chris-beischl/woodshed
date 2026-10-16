@@ -1,6 +1,8 @@
 id: dominant-seventh-roman
 type: play_chord
-title: "V7 in allen Tonarten"
+title:
+  de: "V7 in allen Tonarten"
+  en: "V7 in every key"
 tags: [seventh-chords, dominant, roman]
 importance: 5
 targetSeconds: 8

@@ -1,0 +1,15 @@
+id: sevenths-major
+type: play_chord
+title:
+  de: "Major-Septakkorde (maj7)"
+  en: "Major seventh chords (maj7)"
+tags: [seventh-chords, major]
+importance: 4
+targetSeconds: 8
+estimatedSeconds: 15
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+chord: "I:maj7"
+voicing: root_position

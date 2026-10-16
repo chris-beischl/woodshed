@@ -3,9 +3,11 @@ import { useInput } from "./input/store";
 import { CoursePage } from "./lessons/CoursePage";
 import { LessonPage } from "./lessons/LessonPage";
 import { DevPage } from "./practice/DevPage";
+import { FreeExercisePage, FreePage } from "./practice/FreePage";
 import { PracticePage } from "./practice/PracticePage";
 import { SettingsPage } from "./practice/SettingsPage";
 import { PianoKeyboard } from "./ui/PianoKeyboard";
+import { lang, LANGS, setLang } from "./ui/i18n";
 import { t } from "./ui/strings";
 
 function MidiPicker() {
@@ -37,10 +39,25 @@ export function App() {
           <span className="display text-4xl text-brass">{t.appName}</span>
           <NavLink to="/" end className={link}>{t.nav.practice}</NavLink>
           <NavLink to="/kurs" className={link}>{t.nav.course}</NavLink>
+          <NavLink to="/frei" className={link}>{t.nav.free}</NavLink>
           <NavLink to="/einstellungen" className={link}>{t.nav.settings}</NavLink>
           <NavLink to="/dev" className={link}>{t.nav.dev}</NavLink>
         </nav>
-        <MidiPicker />
+        <div className="flex items-center gap-4">
+          <MidiPicker />
+          <div className="flex gap-1 text-sm" role="group" aria-label={t.language}>
+            {LANGS.map((l) => (
+              <button
+                key={l}
+                onClick={() => l !== lang && setLang(l)}
+                aria-pressed={l === lang}
+                className={`condensed rounded-full px-2.5 py-1 uppercase ${l === lang ? "bg-paper font-bold text-night" : "text-paper-dim hover:text-paper"}`}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+        </div>
       </header>
       <main className="flex flex-1 flex-col">
         <Routes>
@@ -48,6 +65,8 @@ export function App() {
           <Route path="/" element={<div className="my-auto"><PracticePage /></div>} />
           <Route path="/kurs" element={<CoursePage />} />
           <Route path="/lektion/:id" element={<LessonPage />} />
+          <Route path="/frei" element={<FreePage />} />
+          <Route path="/frei/:id" element={<FreeExercisePage />} />
           <Route path="/einstellungen" element={<SettingsPage />} />
           <Route path="/dev" element={<DevPage />} />
         </Routes>

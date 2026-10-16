@@ -1,6 +1,8 @@
 id: scale-natural-minor
 type: play_line
-title: "Natürliche Moll-Tonleiter, eine Oktave auf und ab"
+title:
+  de: "Natürliche Moll-Tonleiter, eine Oktave auf und ab"
+  en: "Natural minor scale, one octave up and down"
 tags: [scales, minor]
 importance: 4
 targetSeconds: 8

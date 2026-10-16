@@ -1,6 +1,8 @@
 id: triads-augmented
 type: play_chord
-title: "Übermäßige Dreiklänge"
+title:
+  de: "Übermäßige Dreiklänge"
+  en: "Augmented triads"
 tags: [triads, augmented]
 importance: 2
 targetSeconds: 6

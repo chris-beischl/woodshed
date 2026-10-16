@@ -1,6 +1,8 @@
 id: scale-degree-note
 type: choice
-title: "Stufen-Sprint: Welcher Ton?"
+title:
+  de: "Stufen-Sprint: Welcher Ton?"
+  en: "Degree sprint: which note?"
 tags: [scales, degrees]
 importance: 3
 targetSeconds: 24

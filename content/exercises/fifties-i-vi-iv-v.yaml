@@ -1,0 +1,15 @@
+id: fifties-i-vi-iv-v
+type: play_progression
+title:
+  de: "50er-Jahre-Progression I–vi–IV–V"
+  en: "Fifties progression I–vi–IV–V"
+tags: [pop, triads, voice-leading]
+importance: 3
+targetSeconds: 12
+estimatedSeconds: 24
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+progression: ["I:maj", "vi:m", "IV:maj", "V:maj"]
+voicing: any

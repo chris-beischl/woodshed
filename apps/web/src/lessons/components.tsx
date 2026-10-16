@@ -11,6 +11,7 @@ import { resolveRoman } from "../theory/roman";
 import { ChordSymbol } from "../ui/ChordSymbol";
 import { displayKey, displayNote, displaySuffix } from "../ui/music";
 import { t } from "../ui/strings";
+import { loc } from "../ui/i18n";
 
 const ChordNotation = lazy(() => import("../notation/ChordNotation").then((m) => ({ default: m.ChordNotation })));
 
@@ -68,11 +69,12 @@ export function Callout({ children, title }: { children: ReactNode; title?: stri
  * An exercise template inline. Attempts are logged with source "lesson" (no FSRS
  * update); "Nächste Tonart" walks through the template's keys.
  */
-export function Exercise({ id, keyName }: { id: string; keyName?: string }) {
+export function Exercise({ id, keyName, startToken }: { id: string; keyName?: string; startToken?: string }) {
   const manifest = useManifest();
   const postReview = usePostReview();
   const template = manifest.data?.templates.find((tpl) => tpl.id === id);
-  const startIndex = template && keyName ? Math.max(0, template.keys.indexOf(keyToken(parseKeyName(keyName, template.mode)))) : 0;
+  const token0 = startToken ?? (template && keyName ? keyToken(parseKeyName(keyName, template.mode)) : undefined);
+  const startIndex = template && token0 ? Math.max(0, template.keys.indexOf(token0)) : 0;
   const [offset, setOffset] = useState(0);
   const [result, setResult] = useState<ExerciseOutcome | null>(null);
 
@@ -87,7 +89,7 @@ export function Exercise({ id, keyName }: { id: string; keyName?: string }) {
 
   return (
     <section className="not-prose my-10 rounded-sm border-2 border-night-3 p-5 sm:p-8">
-      <p className="condensed mb-6 text-lg text-brass">{template.title}</p>
+      <p className="condensed mb-6 text-lg text-brass">{loc(template.title)}</p>
       {result ? (
         <div className="flex flex-wrap items-center gap-4">
           <p className={`condensed text-3xl font-bold ${result.clean ? "text-sage" : "text-paper"}`}>
