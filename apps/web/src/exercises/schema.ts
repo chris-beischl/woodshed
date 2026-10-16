@@ -44,11 +44,25 @@ export const choiceParams = z
   })
   .strict();
 
+export const playLineParams = z
+  .object({
+    ref: z.enum(["key", "chord"]).default("key"),
+    over: z.array(z.string().min(1)).default([]), // roman numerals; ref "chord" uses the first
+    notes: z.array(degree).min(2),
+    contour: z.array(z.union([z.literal(-1), z.literal(0), z.literal(1)])),
+    onMistake: z.enum(["restart", "retry"]).default("restart"),
+    maxMistakes: z.number().int().positive().default(3),
+  })
+  .strict()
+  .refine((p) => p.contour.length === p.notes.length - 1, { message: "contour needs notes.length - 1 entries" })
+  .refine((p) => p.ref === "key" || p.over.length > 0, { message: 'ref "chord" needs an `over` chord' });
+
 /** Each exercise type registers its YAML params schema here (ARCHITECTURE § 5.1). */
 export const PARAM_SCHEMAS = {
   play_chord: playChordParams,
   play_progression: playProgressionParams,
   choice: choiceParams,
+  play_line: playLineParams,
 } as const;
 
 export type ExerciseType = keyof typeof PARAM_SCHEMAS;
@@ -101,3 +115,4 @@ export type Lesson = z.infer<typeof lessonFrontmatterSchema>;
 export type PlayChordParams = z.infer<typeof playChordParams>;
 export type PlayProgressionParams = z.infer<typeof playProgressionParams>;
 export type ChoiceParams = z.infer<typeof choiceParams>;
+export type PlayLineParams = z.infer<typeof playLineParams>;

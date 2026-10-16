@@ -74,7 +74,8 @@ html {
   font-size: 1.6rem;
   margin-top: 1.6em;
 }
-.lesson strong {
+/* Only the lesson's own prose; embedded exercises (.not-prose) keep their styling. */
+.lesson strong:not(.not-prose *) {
   color: var(--color-brass);
   font-weight: 700;
 }

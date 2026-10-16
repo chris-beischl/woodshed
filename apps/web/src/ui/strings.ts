@@ -77,6 +77,13 @@ export const t = {
     movementUnavailable: "Stimmführung nur messbar, wenn jeder Akkord gleich viele Töne hat.",
   },
   ratings: { again: "Nochmal", hard: "Schwer", good: "Gut", easy: "Leicht" } satisfies Record<Rating, string>,
+  line: {
+    progress: (i: number, n: number) => `${i} von ${n} Tönen`,
+    expected: (note: string) => `Erwartet: ${note}`,
+    time: (s: string) => `${s} Sekunden`,
+    best: (s: string) => `Bestzeit ${s} s (nur fehlerfrei)`,
+    newBest: "Neue Bestzeit",
+  },
   quiz: {
     whichNote: "Welcher Ton ist die",
     whichDegree: "Welche Stufe ist",

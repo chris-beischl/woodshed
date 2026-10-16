@@ -5,6 +5,7 @@ import { keysInIntroOrder, keyToken, parseKeyName, type Key, type Mode } from ".
 import { majorScale } from "../src/theory/scale";
 import { pitchClass } from "../src/theory/note";
 import { resolvePlayChord } from "../src/exercises/play_chord/resolve";
+import { resolvePlayLine } from "../src/exercises/play_line/resolve";
 import {
   lessonFrontmatterSchema,
   PARAM_SCHEMAS,
@@ -45,6 +46,10 @@ function pitchClassCollisions(tones: DegreeToken[], rootPc: number): string[] {
 /** The chords a template plays, as play_chord params — so every type shares one check. */
 function chordsOf(type: string, params: unknown): PlayChordParams[] {
   if (type === "play_chord") return [PARAM_SCHEMAS.play_chord.parse(params)];
+  if (type === "play_line") {
+    const p = PARAM_SCHEMAS.play_line.parse(params);
+    return p.over.map((chord) => ({ chord, voicing: "any", constraints: {} }));
+  }
   if (type === "play_progression") {
     const p = PARAM_SCHEMAS.play_progression.parse(params);
     return p.progression.map((chord) => ({ chord, voicing: p.voicing, constraints: p.constraints }));
@@ -61,6 +66,13 @@ function validateInstances(type: string, mode: Mode, params: unknown, keys: Key[
       if (type === "choice") majorScale(key.tonic);
     } catch (e) {
       errors.push(`${keyToken(key)}: ${describe(e)}`);
+    }
+    if (type === "play_line") {
+      try {
+        resolvePlayLine(PARAM_SCHEMAS.play_line.parse(params), key);
+      } catch (e) {
+        errors.push(`${keyToken(key)}: ${describe(e)}`);
+      }
     }
     for (const chord of chordsOf(type, params)) {
       const at = `${keyToken(key)} ${chord.chord}`;

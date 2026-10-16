@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { DegreeQuiz } from "./choice/DegreeQuiz";
 import { PlayChord } from "./play_chord/PlayChord";
+import { PlayLine } from "./play_line/PlayLine";
 import { PlayProgression } from "./play_progression/PlayProgression";
 import type { ExerciseType } from "./schema";
 import type { ExerciseProps } from "./types";
@@ -10,4 +11,5 @@ export const EXERCISE_COMPONENTS: Record<ExerciseType, ComponentType<ExercisePro
   play_chord: PlayChord,
   play_progression: PlayProgression,
   choice: DegreeQuiz,
+  play_line: PlayLine,
 };

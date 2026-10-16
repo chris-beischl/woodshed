@@ -372,14 +372,15 @@ estimatedMinutes) with `extra="ignore"`, so the full Zod schema is not mirrored 
 The web build also writes `manifest.schema.json` via Zod 4's `z.toJSONSchema()` for
 reference. A backend test validates the real manifest.
 
-### 5.5 Licks (`play_lick`)
+### 5.5 Lines: scales and licks (`play_line`)
 
-A lick is a short monophonic line, written **relative to a reference root** with degree
-tokens (§ 3.3) so it spells correctly and transposes to every key:
+A line is a monophonic note sequence: a scale or a lick. It is written **relative to a
+reference root** with degree tokens (§ 3.3) so it spells correctly and transposes to
+every key. Scales use `ref: key`; licks usually `ref: chord`.
 
 ```yaml
 id: lick-enclosure-3
-type: play_lick
+type: play_line
 title: "Enclosure auf die Terz"
 mode: major
 keys: all
@@ -398,13 +399,16 @@ tempo: { start: 80, step: 8 }   # tempo ladder in bpm (M3 enforces timing)
 - **Register**: `contour[i]` is −1/0/+1 = the next note is the nearest pitch *below* /
   either / *above* the previous one (0 = nearest, ties go up). This fixes the shape
   without fixing the octave. The first note may be in any octave.
-- **Evaluation** (pure, in `src/evaluation/lick.ts`): note-ons are compared to the
-  expected MIDI sequence anchored on the first note played. A wrong note = one mistake
-  and the take restarts from the first note; `maxAttempts` (default 3) failed takes =
-  failed. Note-offs, velocity and sustain are ignored. Until M3, only order counts;
+- **Evaluation** (pure, in `src/evaluation/line.ts`): note-ons are compared to the
+  expected MIDI sequence anchored on the first correct note played. A wrong note = one
+  mistake; with `onMistake: restart` (default, licks) the take starts over, with
+  `onMistake: retry` (scales) the player stays on the expected note; retry mode also
+  ignores notes before the first correct one (warming up) and a re-strike of the note
+  just played. `maxMistakes`
+  (default 3) mistakes = failed. Duration counts from the first note played. Note-offs, velocity and sustain are ignored. Until M3, only order counts;
   `targetSeconds` grades speed. In M3, timing is checked against the tempo with a
   tolerance window.
-- **Grading**: § 4.6 with the lick as a single "chord".
+- **Grading**: § 4.6 with the line as a single "chord".
 - **Two hands (M3)**: `leftHand: { voicing: shell }` additionally requires the `over`
   chord to be held below a split point (default C4) while the lick is played above it.
 
@@ -596,7 +600,8 @@ The course itself is planned in `docs/curriculum.md`; milestones follow its unit
 - Settings UI.
 
 ### M2b — Licks (curriculum lick track, unit 3)
-- `play_lick` (§ 5.5) with call & response (`audio` prompt), tempo ladder.
+- `play_line` for licks (§ 5.5) with call & response (`audio` prompt), tempo ladder.
+  (The `play_line` engine itself shipped early in M2a, for scales.)
 - Circle-of-keys mastery view per template.
 - Shell variants `shell_137` / `shell_173`.
 

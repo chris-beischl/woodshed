@@ -123,7 +123,7 @@ Lesson IDs are proposals; they become immutable once created.
 
 - **Unit 1 shipped (M2a)**: lessons `major-scale-degrees`, `triads`, `diatonic-triads`,
   `cadences-voice-leading`, `pop-progression`. Still to come in unit 1: the lick
-  `lick-triad-cascade` and `lick-gospel-amen` (needs `play_lick`, M2b), *Amazing Grace*
+  `lick-triad-cascade` and `lick-gospel-amen` (needs call & response, M2b), *Amazing Grace*
   with melody (needs melody + hand split, M3), and the grooves (M3).
 
 ## What has to be built (feeds `ARCHITECTURE.md § 10`)
@@ -131,7 +131,7 @@ Lesson IDs are proposals; they become immutable once created.
 | Milestone | Features | Unlocks |
 |---|---|---|
 | **M2a** | lesson pages (MDX), `play_progression`, `choice` exercises, new-card cap + gradual key unlock, Tone.js playback (hear chords and resolutions) | Units 1–2 |
-| **M2b** | `play_lick` (§ 5.5), call & response, tempo ladder, circle-of-keys mastery view, shell variants | lick track, Unit 3 |
+| **M2b** | licks on `play_line` (§ 5.5), call & response, tempo ladder, circle-of-keys mastery view, shell variants | lick track, Unit 3 |
 | **M3** | backing grooves + metronome, timing evaluation, hand split (LH chord + RH line), extension qualities, tune exercises | Units 3–5 |
 | **M4** | secondary-dominant grammar (`V:7/ii`), error analytics, FSRS optimisation | Unit 6 |
 

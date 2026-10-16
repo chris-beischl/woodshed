@@ -1,0 +1,16 @@
+id: scale-major
+type: play_line
+title: "Dur-Tonleiter, eine Oktave auf und ab"
+tags: [scales, major]
+importance: 4
+targetSeconds: 8
+estimatedSeconds: 20
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+ref: key
+notes: ["1", "2", "3", "4", "5", "6", "7", "1", "7", "6", "5", "4", "3", "2", "1"]
+contour: [1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, -1]
+onMistake: retry
+maxMistakes: 4

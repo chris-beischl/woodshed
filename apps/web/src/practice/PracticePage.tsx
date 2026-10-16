@@ -115,6 +115,7 @@ export function PracticePage() {
 
       {mismatch && <p className="rounded-sm bg-brass/15 px-3 py-2 text-sm text-brass">{t.practice.contentMismatch}</p>}
 
+      {template && <p className="condensed -mb-6 text-lg text-brass">{template.title}</p>}
       {Exercise && template ? (
         // key = card id: each card gets fresh exercise state.
         <Exercise key={item.card_id} template={template} keyToken={item.key} onSubmit={(o) => save(crypto.randomUUID(), o)} />
