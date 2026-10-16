@@ -44,7 +44,9 @@ Lesson IDs are proposals; they become immutable once created.
 | `diatonic-triads` | I ii iii IV V vi vii° | play from roman numerals | streak |
 | `cadences-voice-leading` | I–IV–V–I, nearest inversion | play the progression, minimal motion | tempo ladder |
 | **Lick** `lick-triad-cascade` | broken triads up/down through I–IV–V | call & response | tempo ladder |
-| **Tune** | I–V–vi–IV pop progression | play over groove, 4 keys | backing groove |
+| **Lick** `lick-gospel-amen` | the "Amen" IV–I cadence with 4–3 suspension in the RH | call & response | — |
+| **Tune** | I–V–vi–IV (the pop progression: *Let It Be*, *No Woman No Cry* …) | play over a pop groove, 4 keys | backing groove |
+| **Tune** | *Amazing Grace* (public domain, so melody included) with gospel triads | melody RH, triads LH | gospel 6/8 groove |
 
 ### Unit 2 — Seventh chords and function *(V7 finally makes sense)*
 
@@ -57,6 +59,8 @@ Lesson IDs are proposals; they become immutable once created.
 | `turnarounds` | I–vi–ii–V, iii–vi–ii–V | progression | backing groove |
 | **Lick** `lick-v7-arpeggio-resolve` | 1-3-5-b7 of V landing on 3 of I | call & response | lick drop |
 | **Lick** `lick-guide-tone-line` | b7→3 half-step line | call & response | — |
+| **Tune** | *Fly Me to the Moon* changes: the diatonic cycle vi–ii–V–I–IV–vii–III–vi | seventh chords, root position | swing groove |
+| **Tune** | *Mercy, Mercy, Mercy* (Zawinul) changes: soul-jazz I–IV over a pedal | triads/sevenths | soul groove |
 
 ### Unit 3 — Bebop language I + left-hand shells *(two hands start here)*
 
@@ -69,6 +73,7 @@ Lesson IDs are proposals; they become immutable once created.
 | **Lick** `lick-bebop-dominant` | bebop dominant scale down from the root of V7 | RH lick | tempo ladder |
 | **Lick** `lick-the-lick` | "The Lick" (1 2 b3 4 2 b7 1 over a minor chord) — the jazz meme | call & response | just for fun |
 | **Tune** | *Tune Up* changes (ii–V–I in D, C, Bb) | LH shells + RH licks | tune unlock, lick drop |
+| **Tune** | *Satin Doll* changes (chains of ii–V) | LH shells + RH licks | swing groove |
 
 ### Unit 4 — Minor and the altered dominant
 
@@ -80,6 +85,7 @@ Lesson IDs are proposals; they become immutable once created.
 | **Lick** `lick-minor-pentatonic` | minor pentatonic over im7 | call & response | tempo ladder |
 | **Tune** | *Autumn Leaves* changes (major + relative minor ii–V–I) | LH shells + RH licks | tune unlock |
 | **Tune** | *Blue Bossa* changes | bossa groove | backing groove |
+| **Tune** | *Sunny* changes (minor ii–V–i in a soul-pop tune) | LH shells + RH licks | soul groove |
 
 ### Unit 5 — Smooth-jazz colours: extensions, rootless, upper structures
 
@@ -91,7 +97,10 @@ Lesson IDs are proposals; they become immutable once created.
 | `upper-structures` | RH triad II over Imaj7 (= maj7#11), V7 colours | play two-hand voicing | — |
 | **Lick** `lick-major-pentatonic-run` | pentatonic run from the 9 over maj7 | call & response | tempo ladder |
 | **Lick** `lick-blues-grace-slide` | b3→3 grace-note slide over a dominant | call & response | — |
-| **Tune** | smooth-jazz vamp (maj9 – m9, Rhodes groove) and *Autumn Leaves* rootless | two hands | tune unlock |
+| **Lick** `lick-neo-soul-slip` | maj9 colour with 2–1 / 4–3 grace slips (neo-soul) | call & response | Rhodes groove |
+| **Tune** | *Cantaloupe Island* changes (Herbie Hancock; Fm7 – Db7 – Dm7 funk vamp) | LH voicings + RH pentatonics | funk groove |
+| **Tune** | *So What* changes (Dm7 / Ebm7, quartal voicings) | two hands | modal swing |
+| **Tune** | smooth-jazz vamp (maj9 – m9) and *Autumn Leaves* rootless | two hands | Rhodes groove |
 
 ### Unit 6 — Chromatic harmony and blues
 
@@ -104,7 +113,11 @@ Lesson IDs are proposals; they become immutable once created.
 | **Lick** `lick-tritone-sub` | bII7 arpeggio resolving to I | call & response | lick drop |
 | **Lick** `lick-half-whole` | half-whole diminished pattern over V7b9 | RH lick | tempo ladder |
 | **Lick** `lick-blues-turnaround` | blues turnaround lick | over the blues groove | lick drop |
-| **Tune** | jazz blues in F, rhythm-changes A section | two hands | tune unlock |
+| **Lick** `lick-montuno` | two-hand Latin montuno pattern over i–iv–V | call & response | Latin groove |
+| **Tune** | *Just the Two of Us* changes (IVmaj7 – III7 – vi7, a secondary dominant hit) | two hands | smooth groove |
+| **Tune** | *Billie's Bounce* changes (bebop blues in F), *Watermelon Man* | two hands | walking bass / funk |
+| **Tune** | rhythm changes A section (*Oleo*) | two hands | up-tempo swing |
+| **Tune** | *The Girl from Ipanema* changes (bossa with a tritone-sub turn) | two hands | bossa groove |
 
 ## What has to be built (feeds `ARCHITECTURE.md § 10`)
 
@@ -115,8 +128,21 @@ Lesson IDs are proposals; they become immutable once created.
 | **M3** | backing grooves + metronome, timing evaluation, hand split (LH chord + RH line), extension qualities, tune exercises | Units 3–5 |
 | **M4** | secondary-dominant grammar (`V:7/ii`), error analytics, FSRS optimisation | Unit 6 |
 
-## Open questions
+## Repertoire and groove styles
 
-- Which tunes do you want? The list above is a default and easy to swap.
-- Smooth-jazz references you like (Bob James, Joe Sample, David Benoit …)? They decide
-  the groove styles in M3.
+Deliberately eclectic ("something from everywhere"): bebop and hard bop, Ellington,
+bossa, modal, soul-jazz, smooth jazz, funk, gospel, neo-soul and Latin. Only the
+changes are used (except public-domain melodies).
+
+Groove styles for M3, each with a sound reference for its feel:
+
+| Groove | Feel reference |
+|---|---|
+| swing, walking bass | Oscar Peterson Trio, Red Garland |
+| up-tempo bebop | Bud Powell |
+| bossa nova | Jobim, Stan Getz & João Gilberto |
+| soul-jazz / gospel 6/8 | Joe Zawinul with Cannonball Adderley, Ramsey Lewis |
+| smooth / Rhodes | Bob James, Joe Sample, Grover Washington Jr. |
+| funk | Herbie Hancock (*Cantaloupe Island*, Head Hunters era) |
+| neo-soul | Robert Glasper |
+| Latin montuno | Eddie Palmieri, Michel Camilo |
