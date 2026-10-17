@@ -47,3 +47,54 @@ describe("makeQuiz", () => {
     }
   });
 });
+
+describe("circle-of-fifths quizzes", () => {
+  // Expected answers per major key, by hand (circle of fifths, Gb not F#: theory-decisions #1).
+  const TABLE: Record<string, { fifth: string; fourth: string; signature: number }> = {
+    C: { fifth: "G", fourth: "F", signature: 0 },
+    G: { fifth: "D", fourth: "C", signature: 1 },
+    D: { fifth: "A", fourth: "G", signature: 2 },
+    A: { fifth: "E", fourth: "D", signature: 3 },
+    E: { fifth: "B", fourth: "A", signature: 4 },
+    B: { fifth: "F#", fourth: "E", signature: 5 },
+    Gb: { fifth: "Db", fourth: "Cb", signature: -6 },
+    Db: { fifth: "Ab", fourth: "Gb", signature: -5 },
+    Ab: { fifth: "Eb", fourth: "Db", signature: -4 },
+    Eb: { fifth: "Bb", fourth: "Ab", signature: -3 },
+    Bb: { fifth: "F", fourth: "Eb", signature: -2 },
+    F: { fifth: "C", fourth: "Bb", signature: -1 },
+  };
+
+  it("covers every major key in the table", () => {
+    expect(MAJOR_KEYS.map((k) => formatNote(k.tonic)).sort()).toEqual(Object.keys(TABLE).sort());
+  });
+
+  it.each(["fifth_up", "fourth_up", "key_signature"] as const)("%s: answers match the table, appear once, 4 distinct options", (ask) => {
+    fc.assert(
+      fc.property(fc.integer(), (seed) => {
+        for (const q of makeQuiz(MAJOR_KEYS[0]!, ask, [], 12, seededRandom(seed))) {
+          if (q.ask === "degree_note" || q.ask === "note_degree") throw new Error();
+          const row = TABLE[formatNote(q.tonic)]!;
+          expect(q.options).toHaveLength(4);
+          if (q.ask === "key_signature") {
+            expect(q.answer).toBe(row.signature);
+            expect(new Set(q.options).size).toBe(4);
+            expect(q.options.filter((o) => o === q.answer)).toHaveLength(1);
+          } else {
+            expect(formatNote(q.answer)).toBe(q.ask === "fifth_up" ? row.fifth : row.fourth);
+            expect(q.options.filter((o) => sameNote(o, q.answer))).toHaveLength(1);
+            expect(new Set(q.options.map(formatNote)).size).toBe(4);
+          }
+        }
+      }),
+    );
+  });
+
+  it("asks a different key each time in a row", () => {
+    const qs = makeQuiz(MAJOR_KEYS[0]!, "fifth_up", [], 30, seededRandom(7));
+    qs.slice(1).forEach((q, i) => {
+      if (q.ask !== "fifth_up" || qs[i]!.ask !== "fifth_up") throw new Error();
+      expect(formatNote(q.tonic)).not.toBe(formatNote((qs[i] as { tonic: Parameters<typeof formatNote>[0] }).tonic));
+    });
+  });
+});

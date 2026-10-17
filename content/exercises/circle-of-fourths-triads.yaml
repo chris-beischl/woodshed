@@ -1,0 +1,17 @@
+id: circle-of-fourths-triads
+type: play_progression
+title:
+  de: "Einmal um den Zirkel: Dur-Dreiklänge in Quarten"
+  en: "Once around the circle: major triads in fourths"
+tags: [circle-of-fifths, triads, voice-leading]
+importance: 4
+targetSeconds: 40
+estimatedSeconds: 70
+mode: major
+# One full lap from C; other start keys would only respell the same lap.
+keys: [C]
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: the bottom of the circle is spelled Gb (bV), not F#. (theory-decisions #18)
+progression: ["I:maj", "IV:maj", "bVII:maj", "bIII:maj", "bVI:maj", "bII:maj", "bV:maj", "VII:maj", "III:maj", "VI:maj", "II:maj", "V:maj", "I:maj"]
+voicing: any

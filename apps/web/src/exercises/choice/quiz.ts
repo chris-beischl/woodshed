@@ -1,12 +1,18 @@
-import type { Key } from "../../theory/keys";
+import { MAJOR_KEYS, type Key } from "../../theory/keys";
 import { LETTERS, mod12, naturalPitchClass, pitchClass, sameNote, type Accidental, type SpelledNote } from "../../theory/note";
 import { majorScale } from "../../theory/scale";
 
-export type Ask = "degree_note" | "note_degree";
+export type Ask = "degree_note" | "note_degree" | "fifth_up" | "fourth_up" | "key_signature";
+
+/** Circle-of-fifths asks draw a different major key per question instead of using the card's key. */
+export const CIRCLE_ASKS: readonly Ask[] = ["fifth_up", "fourth_up", "key_signature"];
 
 export type Question =
   | { ask: "degree_note"; degree: number; answer: SpelledNote; options: SpelledNote[] }
-  | { ask: "note_degree"; note: SpelledNote; answer: number; options: number[] };
+  | { ask: "note_degree"; note: SpelledNote; answer: number; options: number[] }
+  | { ask: "fifth_up" | "fourth_up"; tonic: SpelledNote; answer: SpelledNote; options: SpelledNote[] }
+  /** answer: number of sharps (> 0) or flats (< 0) in the major key signature. */
+  | { ask: "key_signature"; tonic: SpelledNote; answer: number; options: number[] };
 
 /** Deterministic PRNG (mulberry32) so quizzes are reproducible in tests. */
 export function seededRandom(seed: number): () => number {
@@ -55,7 +61,44 @@ function noteDistractors(answer: SpelledNote, scale: SpelledNote[], degree: numb
   return out.slice(0, 3);
 }
 
+/** Sharps (> 0) or flats (< 0) of a major key, counted from its spelled scale. */
+export function keySignature(tonic: SpelledNote): number {
+  return majorScale(tonic).reduce((n, note) => n + note.accidental, 0);
+}
+
+/** Wrong key signatures: the enharmonic opposite (6♭ vs 6♯), then neighbours on the circle. */
+function signatureDistractors(answer: number): number[] {
+  const out: number[] = [];
+  for (const n of [-answer, answer + Math.sign(answer || 1), answer - Math.sign(answer || 1), answer + 2 * Math.sign(answer || 1), -answer - 1, answer - 2]) {
+    if (n !== answer && Math.abs(n) <= 7 && !out.includes(n)) out.push(n);
+  }
+  return out.slice(0, 3);
+}
+
+function makeCircleQuiz(ask: "fifth_up" | "fourth_up" | "key_signature", rounds: number, rnd: () => number): Question[] {
+  const questions: Question[] = [];
+  let prev = -1;
+  for (let i = 0; i < rounds; i++) {
+    let k = Math.floor(rnd() * MAJOR_KEYS.length);
+    if (k === prev) k = (k + 1) % MAJOR_KEYS.length;
+    prev = k;
+    const tonic = MAJOR_KEYS[k]!.tonic;
+    if (ask === "key_signature") {
+      const answer = keySignature(tonic);
+      questions.push({ ask, tonic, answer, options: shuffle([answer, ...signatureDistractors(answer)], rnd) });
+    } else {
+      // Fifth = 5th degree, fourth = 4th degree of the tonic's major scale: letter arithmetic, never pitch class.
+      const degree = ask === "fifth_up" ? 5 : 4;
+      const scale = majorScale(tonic);
+      const answer = scale[degree - 1]!;
+      questions.push({ ask, tonic, answer, options: shuffle([answer, ...noteDistractors(answer, scale, degree)], rnd) });
+    }
+  }
+  return questions;
+}
+
 export function makeQuiz(key: Key, ask: Ask, degrees: number[], rounds: number, rnd: () => number): Question[] {
+  if (ask === "fifth_up" || ask === "fourth_up" || ask === "key_signature") return makeCircleQuiz(ask, rounds, rnd);
   const scale = majorScale(key.tonic);
   const questions: Question[] = [];
   let prev = -1;

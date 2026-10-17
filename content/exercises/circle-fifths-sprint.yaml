@@ -1,0 +1,16 @@
+id: circle-fifths-sprint
+type: choice
+title:
+  de: "Quinten-Sprint: Welcher Ton liegt eine Quinte höher?"
+  en: "Fifths sprint: which note is a fifth up?"
+tags: [circle-of-fifths, intervals]
+importance: 5
+targetSeconds: 24
+estimatedSeconds: 40
+mode: major
+# The quiz draws a new key per question; the card itself has one key.
+keys: [C]
+prompt: { kind: symbol }
+response: { kind: choice }
+ask: fifth_up
+rounds: 12

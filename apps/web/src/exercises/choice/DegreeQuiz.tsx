@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { gradeQuiz } from "../../evaluation/grading";
 import type { Rating } from "../../evaluation/types";
-import { parseKeyToken } from "../../theory/keys";
+import { parseKeyToken, type Key } from "../../theory/keys";
 import { sameNote } from "../../theory/note";
 import { displayKey, displayNote } from "../../ui/music";
 import { t } from "../../ui/strings";
@@ -11,11 +11,43 @@ import { useAdvance, usePedal } from "../useAdvance";
 import { makeQuiz, seededRandom, type Question } from "./quiz";
 
 function isCorrect(q: Question, option: number): boolean {
-  return q.ask === "degree_note" ? sameNote(q.options[option]!, q.answer) : q.options[option] === q.answer;
+  switch (q.ask) {
+    case "degree_note":
+    case "fifth_up":
+    case "fourth_up":
+      return sameNote(q.options[option]!, q.answer);
+    default:
+      return q.options[option] === q.answer;
+  }
 }
 
 function optionLabel(q: Question, i: number): string {
-  return q.ask === "degree_note" ? displayNote(q.options[i]!) : t.quiz.degree(q.options[i]!);
+  switch (q.ask) {
+    case "degree_note":
+    case "fifth_up":
+    case "fourth_up":
+      return displayNote(q.options[i]!);
+    case "note_degree":
+      return t.quiz.degree(q.options[i]!);
+    case "key_signature":
+      return t.quiz.signature(q.options[i]!);
+  }
+}
+
+/** Prompt line, big subject, and the "in <key>" suffix (circle questions carry their own key). */
+function promptOf(q: Question, key: Key): [string, string, string | null] {
+  switch (q.ask) {
+    case "degree_note":
+      return [t.quiz.whichNote, t.quiz.degree(q.degree), displayKey(key)];
+    case "note_degree":
+      return [t.quiz.whichDegree, displayNote(q.note), displayKey(key)];
+    case "fifth_up":
+      return [t.quiz.fifthAbove, displayNote(q.tonic), null];
+    case "fourth_up":
+      return [t.quiz.fourthAbove, displayNote(q.tonic), null];
+    case "key_signature":
+      return [t.quiz.howManyAccidentals, displayKey({ tonic: q.tonic, mode: "major" }), null];
+  }
 }
 
 /** Speed round of scale-degree questions (type `choice`). */
@@ -114,6 +146,7 @@ export function DegreeQuiz({ template, keyToken, onSubmit }: ExerciseProps) {
     );
   }
 
+  const prompt = promptOf(q, key);
   return (
     <div className="space-y-8">
       <div className="flex items-baseline gap-4 text-paper-dim">
@@ -121,12 +154,14 @@ export function DegreeQuiz({ template, keyToken, onSubmit }: ExerciseProps) {
         {combo >= 3 && <span className="condensed rounded-full bg-sage px-3 py-0.5 font-bold text-night">{t.quiz.combo(combo)}</span>}
       </div>
       <div>
-        <p className="condensed text-2xl text-paper-dim">{q.ask === "degree_note" ? t.quiz.whichNote : t.quiz.whichDegree}</p>
+        <p className="condensed text-2xl text-paper-dim">{prompt[0]}</p>
         <p className="flex flex-wrap items-end gap-x-6">
-          <span className="display text-[clamp(5rem,16vw,10rem)]">{q.ask === "degree_note" ? t.quiz.degree(q.degree) : displayNote(q.note)}</span>
-          <span className="condensed pb-[0.2em] text-[clamp(2rem,6vw,4rem)] leading-none font-bold">
-            {t.exercise.in} {displayKey(key)}
-          </span>
+          <span className="display text-[clamp(5rem,16vw,10rem)]">{prompt[1]}</span>
+          {prompt[2] && (
+            <span className="condensed pb-[0.2em] text-[clamp(2rem,6vw,4rem)] leading-none font-bold">
+              {t.exercise.in} {prompt[2]}
+            </span>
+          )}
         </p>
       </div>
       <div className="grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">

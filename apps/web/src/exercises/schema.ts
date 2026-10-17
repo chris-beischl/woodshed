@@ -40,7 +40,7 @@ export const playProgressionParams = z
 
 export const choiceParams = z
   .object({
-    ask: z.enum(["degree_note", "note_degree"]),
+    ask: z.enum(["degree_note", "note_degree", "fifth_up", "fourth_up", "key_signature"]),
     degrees: z.array(z.number().int().min(1).max(7)).min(1).default([1, 2, 3, 4, 5, 6, 7]),
     rounds: z.number().int().min(1).max(30).default(8),
   })

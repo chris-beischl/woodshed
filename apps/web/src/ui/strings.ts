@@ -34,7 +34,7 @@ const de = {
   },
   lesson: {
     listen: "Anhören",
-    nextKey: "Nächste Tonart",
+    circleLabel: "Quintenzirkel: im Uhrzeigersinn je eine Quinte höher",
     complete: "Lektion abschließen",
     completeHint: "Legt die Übungen dieser Lektion als Karten in deinem Übungsplan an.",
     cardsCreated: (n: number) => (n === 1 ? "1 neue Karte im Übungsplan" : `${n} neue Karten im Übungsplan`),
@@ -115,6 +115,10 @@ const de = {
     round: (i: number, n: number) => `Frage ${i} von ${n}`,
     combo: (n: number) => `${n} richtig in Folge`,
     summary: (s: number) => `richtig, in ${s} Sekunden`,
+    fifthAbove: "Welcher Ton liegt eine Quinte über",
+    fourthAbove: "Welcher Ton liegt eine Quarte über",
+    howManyAccidentals: "Wie viele Vorzeichen hat",
+    signature: (n: number) => (n === 0 ? "keine" : `${Math.abs(n)}${n > 0 ? "♯" : "♭"}`),
   },
   practice: {
     loading: "Lade Tagesplan …",
@@ -177,7 +181,7 @@ const en: typeof de = {
   },
   lesson: {
     listen: "Listen",
-    nextKey: "Next key",
+    circleLabel: "Circle of fifths: one fifth higher per step clockwise",
     complete: "Complete lesson",
     completeHint: "Adds this lesson's exercises to your practice plan as cards.",
     cardsCreated: (n: number) => (n === 1 ? "1 new card in your practice plan" : `${n} new cards in your practice plan`),
@@ -258,6 +262,10 @@ const en: typeof de = {
     round: (i: number, n: number) => `Question ${i} of ${n}`,
     combo: (n: number) => `${n} in a row`,
     summary: (s: number) => `correct, in ${s} seconds`,
+    fifthAbove: "Which note is a fifth above",
+    fourthAbove: "Which note is a fourth above",
+    howManyAccidentals: "How many sharps or flats in",
+    signature: (n: number) => (n === 0 ? "none" : `${Math.abs(n)}${n > 0 ? "♯" : "♭"}`),
   },
   practice: {
     loading: "Loading today's plan …",

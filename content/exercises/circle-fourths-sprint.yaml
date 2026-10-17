@@ -1,0 +1,16 @@
+id: circle-fourths-sprint
+type: choice
+title:
+  de: "Quarten-Sprint: Welcher Ton liegt eine Quarte höher?"
+  en: "Fourths sprint: which note is a fourth up?"
+tags: [circle-of-fifths, intervals]
+importance: 4
+targetSeconds: 24
+estimatedSeconds: 40
+mode: major
+# The quiz draws a new key per question; the card itself has one key.
+keys: [C]
+prompt: { kind: symbol }
+response: { kind: choice }
+ask: fourth_up
+rounds: 12

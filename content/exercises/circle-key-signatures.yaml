@@ -1,0 +1,16 @@
+id: circle-key-signatures
+type: choice
+title:
+  de: "Vorzeichen-Sprint: Wie viele ♯ oder ♭?"
+  en: "Key signature sprint: how many ♯ or ♭?"
+tags: [circle-of-fifths, key-signatures]
+importance: 5
+targetSeconds: 24
+estimatedSeconds: 40
+mode: major
+# The quiz draws a new key per question; the card itself has one key.
+keys: [C]
+prompt: { kind: symbol }
+response: { kind: choice }
+ask: key_signature
+rounds: 12

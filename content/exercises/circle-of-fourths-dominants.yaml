@@ -1,0 +1,17 @@
+id: circle-of-fourths-dominants
+type: play_progression
+title:
+  de: "Einmal um den Zirkel: Dominantseptakkorde in Quarten"
+  en: "Once around the circle: dominant sevenths in fourths"
+tags: [circle-of-fifths, dominant, jazz, voice-leading]
+importance: 3
+targetSeconds: 50
+estimatedSeconds: 90
+mode: major
+# One full lap from C; other start keys would only respell the same lap.
+keys: [C]
+prompt: { kind: symbol }
+response: { kind: play }
+# THEORY-DECISION: the bottom of the circle is spelled Gb (bV), not F#. (theory-decisions #18)
+progression: ["I:7", "IV:7", "bVII:7", "bIII:7", "bVI:7", "bII:7", "bV:7", "VII:7", "III:7", "VI:7", "II:7", "V:7", "I:7"]
+voicing: any
