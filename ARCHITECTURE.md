@@ -435,6 +435,10 @@ MDX components (grow as needed): `ChordDemo` (notation + on-screen keyboard +
 playback), `Keyboard`, `Notation`, `Exercise` (renders a template instance inline),
 `Callout`.
 
+**Root in bass**: a player setting decides whether `any` / `root_position` chords need
+the root in the bass. `<Exercise id="…" rootPosition={true|false} />` forces it for a
+lesson that depends on it (theory-decisions #17).
+
 **Languages**: `<id>.mdx` holds the frontmatter and the German body; `<id>.en.mdx` the
 English body only (no frontmatter). The app loads the file for the UI language; the
 manifest build fails if a lesson has no English body.

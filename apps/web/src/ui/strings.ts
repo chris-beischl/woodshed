@@ -74,6 +74,8 @@ const de = {
     rapidFire: "Schnellfeuer",
     rapidFireHint: "Nach einem fehlerfreien Versuch geht es ohne Klick direkt weiter.",
     pedalNext: "Pedal = Weiter",
+    rootPosition: "Grundton im Bass",
+    rootPositionHint: "An: Akkorde nur in Grundstellung. Aus: jede Umkehrung zählt. Manche Lektionen legen das fest.",
     pedalNextHint: "Das Haltepedal gibt während eines Versuchs auf (zeigt die Lösung) und geht danach weiter.",
   },
   exercise: {
@@ -215,6 +217,8 @@ const en: typeof de = {
     rapidFire: "Rapid fire",
     rapidFireHint: "After a clean attempt, move on to the next one without clicking.",
     pedalNext: "Pedal = next",
+    rootPosition: "Root in bass",
+    rootPositionHint: "On: chords in root position only. Off: any inversion counts. Some lessons fix this.",
     pedalNextHint: "The sustain pedal gives up during an attempt (shows the answer) and moves on after it.",
   },
   exercise: {

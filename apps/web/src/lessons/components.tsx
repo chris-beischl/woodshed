@@ -71,7 +71,7 @@ export function Callout({ children, title }: { children: ReactNode; title?: stri
  * An exercise template inline. Attempts are logged with source "lesson" (no FSRS
  * update); "Nächste Tonart" walks through the template's keys.
  */
-export function Exercise({ id, keyName, startToken }: { id: string; keyName?: string; startToken?: string }) {
+export function Exercise({ id, keyName, startToken, rootPosition }: { id: string; keyName?: string; startToken?: string; rootPosition?: boolean }) {
   const manifest = useManifest();
   const postReview = usePostReview();
   const template = manifest.data?.templates.find((tpl) => tpl.id === id);
@@ -114,7 +114,7 @@ export function Exercise({ id, keyName, startToken }: { id: string; keyName?: st
           </button>
         </div>
       ) : (
-        <Component key={`${token}#${offset}`} template={template} keyToken={token} onSubmit={submit} />
+        <Component key={`${token}#${offset}`} template={template} keyToken={token} onSubmit={submit} rootPosition={rootPosition} />
       )}
     </section>
   );

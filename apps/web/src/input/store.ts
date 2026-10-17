@@ -8,6 +8,7 @@ const LAST_DEVICE = "woodshed.midiDevice";
 const SETTLE = "woodshed.settleMs";
 const RAPID_FIRE = "woodshed.rapidFire";
 const PEDAL_NEXT = "woodshed.pedalNext";
+const ROOT_POSITION = "woodshed.rootPosition";
 
 function load(key: string): string | null {
   try {
@@ -43,6 +44,9 @@ interface InputState {
   /** Sustain pedal = "Give up" during an attempt, "Next" on the result (per-viewer convenience). */
   pedalNext: boolean;
   setPedalNext(on: boolean): void;
+  /** Chord drills require the root in the bass (off = any inversion). Lessons may force it. */
+  rootPosition: boolean;
+  setRootPosition(on: boolean): void;
 }
 
 /** All sources feed one stream; evaluation never knows where notes came from. */
@@ -105,6 +109,11 @@ export const useInput = create<InputState>((set, get) => {
     setPedalNext(on) {
       save(PEDAL_NEXT, on ? "1" : "0");
       set({ pedalNext: on });
+    },
+    rootPosition: load(ROOT_POSITION) === "1",
+    setRootPosition(on) {
+      save(ROOT_POSITION, on ? "1" : "0");
+      set({ rootPosition: on });
     },
   };
 });

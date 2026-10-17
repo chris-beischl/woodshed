@@ -43,11 +43,12 @@ function Toggle({ on, set, label, hint }: { on: boolean; set: (on: boolean) => v
 }
 
 function PlayToggles() {
-  const { rapidFire, setRapidFire, pedalNext, setPedalNext } = useInput();
+  const { rapidFire, setRapidFire, pedalNext, setPedalNext, rootPosition, setRootPosition } = useInput();
   return (
     <>
       <Toggle on={rapidFire} set={setRapidFire} label={`⚡ ${t.input.rapidFire}`} hint={t.input.rapidFireHint} />
       <Toggle on={pedalNext} set={setPedalNext} label={t.input.pedalNext} hint={t.input.pedalNextHint} />
+      <Toggle on={rootPosition} set={setRootPosition} label={t.input.rootPosition} hint={t.input.rootPositionHint} />
     </>
   );
 }

@@ -14,4 +14,6 @@ export interface ExerciseProps {
   template: ManifestTemplate;
   keyToken: string;
   onSubmit(outcome: ExerciseOutcome): void;
+  /** Forces "root in bass" on or off (lessons that need it); otherwise the player's setting applies. */
+  rootPosition?: boolean;
 }
