@@ -62,7 +62,11 @@ export const useInput = create<InputState>((set, get) => {
       if (source instanceof WebMidiInputSource && source.id !== get().selectedMidi) return;
       if (e.type === "noteOn") set({ held: [...new Set([...get().held, e.midi])].sort((a, b) => a - b) });
       if (e.type === "noteOff") set({ held: get().held.filter((m) => m !== e.midi) });
-      if (e.type === "sustain") set({ sustain: e.on });
+      if (e.type === "sustain") {
+        // Continuous pedals stream CC64 values while moving: forward only real down/up changes.
+        if (e.on === get().sustain) return;
+        set({ sustain: e.on });
+      }
       for (const l of listeners) l(e);
     });
   }

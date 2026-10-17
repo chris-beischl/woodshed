@@ -29,6 +29,10 @@ export function useAdvance(clean: boolean, submit: () => void): () => void {
   return go;
 }
 
+/** A pedal fluttering around the half-way point must not count as several presses. */
+const PEDAL_COOLDOWN_MS = 500;
+let lastPedalAction = -Infinity;
+
 /** In pedal-next mode, pressing the sustain pedal runs `action` (null = pedal does nothing here). */
 export function usePedal(action: (() => void) | null): void {
   const pedalNext = useInput((s) => s.pedalNext);
@@ -40,7 +44,9 @@ export function usePedal(action: (() => void) | null): void {
   useEffect(() => {
     if (!active) return;
     return subscribeAll((e) => {
-      if (e.type === "sustain" && e.on) latest.current?.();
+      if (e.type !== "sustain" || !e.on || e.t - lastPedalAction < PEDAL_COOLDOWN_MS) return;
+      lastPedalAction = e.t;
+      latest.current?.();
     });
   }, [active]);
 }
