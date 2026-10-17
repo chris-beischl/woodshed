@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useInput } from "../input/store";
+import { subscribeAll, useInput } from "../input/store";
 
 /** Long enough to see the green stamp, short enough to keep the flow. */
 export const RAPID_FIRE_DELAY_MS = 700;
@@ -27,4 +27,20 @@ export function useAdvance(clean: boolean, submit: () => void): () => void {
     return () => clearTimeout(id);
   }, [rapidFire, clean, go]);
   return go;
+}
+
+/** In pedal-next mode, pressing the sustain pedal runs `action` (null = pedal does nothing here). */
+export function usePedal(action: (() => void) | null): void {
+  const pedalNext = useInput((s) => s.pedalNext);
+  const latest = useRef(action);
+  useEffect(() => {
+    latest.current = action;
+  });
+  const active = pedalNext && action !== null;
+  useEffect(() => {
+    if (!active) return;
+    return subscribeAll((e) => {
+      if (e.type === "sustain" && e.on) latest.current?.();
+    });
+  }, [active]);
 }

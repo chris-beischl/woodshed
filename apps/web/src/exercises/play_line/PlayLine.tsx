@@ -9,7 +9,7 @@ import { displayKey, displayNote } from "../../ui/music";
 import { t } from "../../ui/strings";
 import { playLineParams } from "../schema";
 import type { ExerciseProps } from "../types";
-import { useAdvance } from "../useAdvance";
+import { useAdvance, usePedal } from "../useAdvance";
 import { loadBest, saveBest } from "../chords/best";
 import { resolvePlayLine } from "./resolve";
 
@@ -91,6 +91,12 @@ export function PlayLine({ template, keyToken, onSubmit }: ExerciseProps) {
     });
   });
 
+  const giveUp = () => {
+    finishedAt.current = performance.now();
+    setAbandoned(true);
+  };
+  usePedal(done ? advance : giveUp);
+
   return (
     <div className="space-y-8">
       <div>
@@ -170,10 +176,7 @@ export function PlayLine({ template, keyToken, onSubmit }: ExerciseProps) {
 
       {!done && (
         <button
-          onClick={() => {
-            finishedAt.current = performance.now();
-            setAbandoned(true);
-          }}
+          onClick={giveUp}
           className="text-sm text-paper-dim underline underline-offset-4 hover:text-paper"
         >
           {t.exercise.giveUp}

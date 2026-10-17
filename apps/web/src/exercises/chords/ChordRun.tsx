@@ -15,7 +15,7 @@ import { t } from "../../ui/strings";
 import type { PlayChordInstance } from "../play_chord/resolve";
 import type { ManifestTemplate } from "../schema";
 import type { ExerciseOutcome } from "../types";
-import { useAdvance } from "../useAdvance";
+import { useAdvance, usePedal } from "../useAdvance";
 import { loadBest, saveBest } from "./best";
 
 // VexFlow is large and only needed after an attempt.
@@ -114,6 +114,11 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
 
   const clean = done && !abandoned && allCorrect && totalMistakes === 0;
   const advance = useAdvance(clean, submit);
+  const giveUp = () => {
+    finishedAt.current = performance.now();
+    setAbandoned(true);
+  };
+  usePedal(done ? advance : giveUp);
 
   function submit() {
     if (!computed) return;
@@ -241,10 +246,7 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
 
       {!done && (
         <button
-          onClick={() => {
-            finishedAt.current = performance.now();
-            setAbandoned(true);
-          }}
+          onClick={giveUp}
           className="justify-self-start text-sm text-paper-dim underline underline-offset-4 hover:text-paper md:justify-self-end"
         >
           {t.exercise.giveUp}

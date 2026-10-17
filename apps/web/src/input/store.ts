@@ -7,6 +7,7 @@ import { t } from "../ui/strings";
 const LAST_DEVICE = "woodshed.midiDevice";
 const SETTLE = "woodshed.settleMs";
 const RAPID_FIRE = "woodshed.rapidFire";
+const PEDAL_NEXT = "woodshed.pedalNext";
 
 function load(key: string): string | null {
   try {
@@ -39,6 +40,9 @@ interface InputState {
   /** Skip "Next" after a clean attempt (per-viewer convenience). */
   rapidFire: boolean;
   setRapidFire(on: boolean): void;
+  /** Sustain pedal = "Give up" during an attempt, "Next" on the result (per-viewer convenience). */
+  pedalNext: boolean;
+  setPedalNext(on: boolean): void;
 }
 
 /** All sources feed one stream; evaluation never knows where notes came from. */
@@ -96,6 +100,11 @@ export const useInput = create<InputState>((set, get) => {
     setRapidFire(on) {
       save(RAPID_FIRE, on ? "1" : "0");
       set({ rapidFire: on });
+    },
+    pedalNext: load(PEDAL_NEXT) === "1",
+    setPedalNext(on) {
+      save(PEDAL_NEXT, on ? "1" : "0");
+      set({ pedalNext: on });
     },
   };
 });

@@ -4,6 +4,7 @@ import { playChords } from "../audio/player";
 import { useManifest } from "../content/useManifest";
 import { EXERCISE_COMPONENTS } from "../exercises/registry";
 import { useInput } from "../input/store";
+import { usePedal } from "../exercises/useAdvance";
 import type { ExerciseOutcome } from "../exercises/types";
 import { chordTones } from "../theory/chords";
 import { keyToken, parseKeyName, type Mode } from "../theory/keys";
@@ -79,6 +80,11 @@ export function Exercise({ id, keyName, startToken }: { id: string; keyName?: st
   const [offset, setOffset] = useState(0);
   const [result, setResult] = useState<ExerciseOutcome | null>(null);
   const rapidFire = useInput((s) => s.rapidFire);
+  const nextKey = () => {
+    setResult(null);
+    setOffset((o) => o + 1);
+  };
+  usePedal(result ? nextKey : null);
 
   if (!template) return <p className="text-signal">Unknown exercise {id}</p>;
   const Component = EXERCISE_COMPONENTS[template.type];
@@ -101,10 +107,7 @@ export function Exercise({ id, keyName, startToken }: { id: string; keyName?: st
           </p>
           <button
             autoFocus
-            onClick={() => {
-              setResult(null);
-              setOffset((o) => o + 1);
-            }}
+            onClick={nextKey}
             className="rounded-full bg-brass px-6 py-2 font-bold text-night hover:bg-brass-deep"
           >
             {t.lesson.nextKey}

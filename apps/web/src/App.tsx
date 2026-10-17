@@ -29,17 +29,26 @@ function MidiPicker() {
   );
 }
 
-function RapidFireToggle() {
-  const { rapidFire, setRapidFire } = useInput();
+function Toggle({ on, set, label, hint }: { on: boolean; set: (on: boolean) => void; label: string; hint: string }) {
   return (
     <button
-      onClick={() => setRapidFire(!rapidFire)}
-      aria-pressed={rapidFire}
-      title={t.input.rapidFireHint}
-      className={`rounded-full border px-4 py-1.5 text-sm ${rapidFire ? "border-brass bg-brass font-bold text-night" : "border-paper/40 hover:border-paper"}`}
+      onClick={() => set(!on)}
+      aria-pressed={on}
+      title={hint}
+      className={`rounded-full border px-4 py-1.5 text-sm ${on ? "border-brass bg-brass font-bold text-night" : "border-paper/40 hover:border-paper"}`}
     >
-      ⚡ {t.input.rapidFire}
+      {label}
     </button>
+  );
+}
+
+function PlayToggles() {
+  const { rapidFire, setRapidFire, pedalNext, setPedalNext } = useInput();
+  return (
+    <>
+      <Toggle on={rapidFire} set={setRapidFire} label={`⚡ ${t.input.rapidFire}`} hint={t.input.rapidFireHint} />
+      <Toggle on={pedalNext} set={setPedalNext} label={t.input.pedalNext} hint={t.input.pedalNextHint} />
+    </>
   );
 }
 
@@ -58,7 +67,7 @@ export function App() {
           <NavLink to="/dev" className={link}>{t.nav.dev}</NavLink>
         </nav>
         <div className="flex items-center gap-4">
-          <RapidFireToggle />
+          <PlayToggles />
           <MidiPicker />
           <div className="flex gap-1 text-sm" role="group" aria-label={t.language}>
             {LANGS.map((l) => (
