@@ -35,6 +35,7 @@ interface Props {
 /** Plays one chord or a progression: shared by play_chord and play_progression. */
 export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerChord = 3, onSubmit }: Props) {
   const settleMs = useInput((s) => s.settleMs);
+  const { keyOnly: keyOnlySetting, setKeyOnly } = useInput();
   const [state, setState] = useState<RunnerState | null>(null);
   const [abandoned, setAbandoned] = useState(false);
   const [override, setOverride] = useState<Rating | null>(null);
@@ -144,8 +145,18 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
   }
 
   const size = progression ? "text-[clamp(3.5rem,10vw,7.5rem)]" : "text-[clamp(7rem,24vw,15rem)]";
+  // Key only: the player works out the chords from the key; each symbol appears once played.
+  const keyOnly = progression && keyOnlySetting;
   const symbols = chords.map((c, i) => {
     const tone = toneOf(i);
+    if (keyOnly && !done && !progress[i]!.correct) {
+      const active = i === index ? "text-brass" : "opacity-30";
+      return (
+        <span key={i} className={`display leading-none ${size} ${active}`} aria-label={t.exercise.hiddenChord}>
+          ?
+        </span>
+      );
+    }
     const dim = progression && !done && i > index ? "opacity-30" : "";
     const active = progression && !done && i === index ? "underline decoration-brass decoration-[0.06em] underline-offset-[0.12em]" : "";
     return (
@@ -166,13 +177,24 @@ export function ChordRun({ template, keyToken, musicKey, chords, maxAttemptsPerC
         <div key={done ? "done" : "open"} className={done && allCorrect ? "stamp origin-left" : ""}>
           <div className={`flex flex-wrap items-end ${progression ? "gap-x-6 gap-y-2" : "gap-x-8"}`}>
             {symbols}
-            {template.prompt.kind === "roman" && (
+            {(template.prompt.kind === "roman" || keyOnly) && (
               <span className="condensed pb-[0.15em] text-[clamp(2rem,6vw,4.5rem)] leading-none font-bold">
                 {t.exercise.in} {displayKey(musicKey)}
               </span>
             )}
           </div>
         </div>
+
+        {progression && !done && (
+          <button
+            onClick={() => setKeyOnly(!keyOnlySetting)}
+            aria-pressed={keyOnlySetting}
+            title={t.exercise.keyOnlyHint}
+            className={`mt-4 rounded-full border px-3 py-1 text-sm ${keyOnlySetting ? "border-brass bg-brass font-bold text-night" : "border-paper/40 text-paper-dim hover:border-paper hover:text-paper"}`}
+          >
+            {t.exercise.keyOnly}
+          </button>
+        )}
 
         <div className="mt-4 flex min-h-8 flex-wrap items-center gap-4" aria-live="polite">
           <span className="flex gap-1.5" aria-label={t.exercise.mistakes(current.mistakes)}>

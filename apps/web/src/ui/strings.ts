@@ -99,6 +99,9 @@ const de = {
     best: (n: number) => `Bestwert ${n}`,
     newBest: "Neuer Bestwert",
     movementUnavailable: "Stimmführung nur messbar, wenn jeder Akkord gleich viele Töne hat.",
+    keyOnly: "Nur die Tonart zeigen",
+    keyOnlyHint: "Die Akkorde selbst aus der Tonart ableiten; jedes Symbol erscheint, sobald du es gespielt hast.",
+    hiddenChord: "Verdeckter Akkord",
   },
   ratings: { again: "Nochmal", hard: "Schwer", good: "Gut", easy: "Leicht" } satisfies Record<Rating, string>,
   line: {
@@ -246,6 +249,9 @@ const en: typeof de = {
     best: (n: number) => `Best ${n}`,
     newBest: "New best",
     movementUnavailable: "Voice leading can only be measured when every chord has the same number of notes.",
+    keyOnly: "Show only the key",
+    keyOnlyHint: "Work out the chords from the key yourself; each symbol appears once you have played it.",
+    hiddenChord: "Hidden chord",
   },
   ratings: { again: "Again", hard: "Hard", good: "Good", easy: "Easy" },
   line: {
