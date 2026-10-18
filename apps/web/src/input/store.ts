@@ -60,10 +60,26 @@ export function subscribeAll(handler: (e: NoteEvent) => void): () => void {
   return () => listeners.delete(handler);
 }
 
+/**
+ * The two lowest keys of an 88-key piano are remote-control buttons (lesson slides):
+ * A0 = forward, B♭0 = back. They never reach exercises, which would count them as wrong notes.
+ */
+export const CONTROL_NOTES = { next: 21, prev: 22 } as const;
+export type Control = keyof typeof CONTROL_NOTES;
+const controlListeners = new Set<(c: Control) => void>();
+export function subscribeControl(handler: (c: Control) => void): () => void {
+  controlListeners.add(handler);
+  return () => controlListeners.delete(handler);
+}
+
 export const useInput = create<InputState>((set, get) => {
   function attach(source: InputSource) {
     source.subscribe((e) => {
       if (source instanceof WebMidiInputSource && source.id !== get().selectedMidi) return;
+      if ((e.type === "noteOn" || e.type === "noteOff") && (e.midi === CONTROL_NOTES.next || e.midi === CONTROL_NOTES.prev)) {
+        if (e.type === "noteOn") for (const l of controlListeners) l(e.midi === CONTROL_NOTES.next ? "next" : "prev");
+        return;
+      }
       if (e.type === "noteOn") set({ held: [...new Set([...get().held, e.midi])].sort((a, b) => a - b) });
       if (e.type === "noteOff") set({ held: get().held.filter((m) => m !== e.midi) });
       if (e.type === "sustain") {

@@ -57,7 +57,7 @@ export function App() {
   const link = ({ isActive }: { isActive: boolean }) =>
     `condensed text-lg ${isActive ? "text-paper underline decoration-brass decoration-2 underline-offset-8" : "text-paper-dim hover:text-paper"}`;
   return (
-    <div className="mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-4 pt-5 sm:px-8">
+    <div className="mx-auto flex h-dvh max-w-6xl flex-col gap-6 px-4 pt-5 sm:px-8">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <nav className="flex items-baseline gap-6">
           <span className="display text-4xl text-brass">{t.appName}</span>
@@ -84,7 +84,8 @@ export function App() {
           </div>
         </div>
       </header>
-      <main className="flex flex-1 flex-col">
+      {/* Pages scroll here, between header and keyboard; lesson slides fill exactly this area. */}
+      <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         <Routes>
           {/* The practice screen floats in the middle like a record sleeve; other pages read top-down. */}
           <Route path="/" element={<div className="my-auto"><PracticePage /></div>} />
@@ -97,7 +98,7 @@ export function App() {
         </Routes>
       </main>
       {/* Pinned so held keys stay visible while scrolling through a lesson. */}
-      <div className="sticky bottom-0 -mx-4 bg-night/95 px-4 pt-3 pb-3 backdrop-blur sm:-mx-8 sm:px-8">
+      <div className="-mx-4 shrink-0 bg-night/95 px-4 pt-3 pb-3 sm:-mx-8 sm:px-8">
         <PianoKeyboard />
       </div>
     </div>

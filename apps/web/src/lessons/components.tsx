@@ -1,4 +1,4 @@
-import { lazy, Suspense, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useContext, useMemo, useState, type ReactNode } from "react";
 import { usePostReview } from "../progress/client";
 import { playChords } from "../audio/player";
 import { useManifest } from "../content/useManifest";
@@ -12,6 +12,7 @@ import { ChordSymbol } from "../ui/ChordSymbol";
 import { displayKey, displayNote, displaySuffix } from "../ui/music";
 import { t } from "../ui/strings";
 import { loc } from "../ui/i18n";
+import { SlideContext } from "./SlideDeck";
 
 const ChordNotation = lazy(() => import("../notation/ChordNotation").then((m) => ({ default: m.ChordNotation })));
 
@@ -76,6 +77,7 @@ export function Exercise({ id, keyName, startToken, rootPosition }: { id: string
   const token0 = startToken ?? (template && keyName ? keyToken(parseKeyName(keyName, template.mode)) : undefined);
   const startIndex = template && token0 ? Math.max(0, template.keys.indexOf(token0)) : 0;
   const [offset, setOffset] = useState(0);
+  const { active } = useContext(SlideContext);
 
   if (!template) return <p className="text-signal">Unknown exercise {id}</p>;
   const Component = EXERCISE_COMPONENTS[template.type];
@@ -90,7 +92,8 @@ export function Exercise({ id, keyName, startToken, rootPosition }: { id: string
   return (
     <section className="not-prose my-10 rounded-sm border-2 border-night-3 p-5 sm:p-8">
       <p className="condensed mb-6 text-lg text-brass">{loc(template.title)}</p>
-      <Component key={`${token}#${offset}`} template={template} keyToken={token} onSubmit={submit} rootPosition={rootPosition} />
+      {/* Off-slide exercises don't listen, so playing only ever answers the visible one. */}
+      {!active ? <p className="text-paper-dim">{t.lesson.exerciseWaiting}</p> : <Component key={`${token}#${offset}`} template={template} keyToken={token} onSubmit={submit} rootPosition={rootPosition} />}
     </section>
   );
 }

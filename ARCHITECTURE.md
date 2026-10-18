@@ -439,6 +439,15 @@ playback), `Keyboard`, `Notation`, `Exercise` (renders a template instance inlin
 the root in the bass. `<Exercise id="…" rootPosition={true|false} />` forces it for a
 lesson that depends on it (theory-decisions #17).
 
+**Slides**: a lesson is a deck, one slide per screen (`src/lessons/SlideDeck.tsx`). `---`
+(with blank lines around it) ends a slide. Each slide delivers **one** new idea, links it to
+what came before, and, whenever possible, ends in a small `<Exercise>` that loops through
+keys until the learner moves on. The deck adds a title slide and a completion slide.
+Navigation: sustain pedal, A0 (forward) / B♭0 (back) — both reserved and never passed to
+exercises — and arrow keys; scrolling still works. Only the active slide's exercise
+listens to input. On an exercise slide with "Pedal = next" on, the pedal belongs to the
+exercise. German and English must have the same number of slides (tested).
+
 **Languages**: `<id>.mdx` holds the frontmatter and the German body; `<id>.en.mdx` the
 English body only (no frontmatter). The app loads the file for the UI language; the
 manifest build fails if a lesson has no English body.

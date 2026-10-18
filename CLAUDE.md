@@ -124,6 +124,8 @@ the user is by definition not yet able to spot it. Therefore:
   too. Changing the key set requires a migration of the stored learner state (bump its
   `version` and convert on load).
 - Lessons reference exercises by ID; exercises are never defined inside MDX.
+- Lessons are slide decks: `---` between slides, one idea per slide, a playable exercise
+  on a slide whenever possible (`ARCHITECTURE.md § 6`).
 
 ### Progress stays in the browser
 - Evaluation computes the *grade* (Again/Hard/Good/Easy); `src/progress/` turns it into

@@ -1,0 +1,18 @@
+id: degrees-half-steps
+type: play_line
+title:
+  de: "Die zwei Halbtonschritte: 3–4 und 7–8"
+  en: "The two half steps: 3–4 and 7–8"
+tags: [scales, degrees, major]
+importance: 2
+targetSeconds: 4
+estimatedSeconds: 10
+mode: major
+keys: all
+prompt: { kind: symbol }
+response: { kind: play }
+ref: key
+notes: ["3", "4", "7", "1"]
+contour: [1, 1, 1]
+onMistake: retry
+maxMistakes: 4
