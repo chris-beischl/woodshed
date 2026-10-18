@@ -88,14 +88,14 @@ html {
 .lesson li + li { margin-top: 0.3em; }
 /* A slide carries one idea: bigger type, and its heading sits at the top, not 2em down. */
 .slide {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
 }
 .slide > h2:first-child,
 .slide > h3:first-child {
   margin-top: 0;
 }
 .slide h2 {
-  font-size: clamp(2.6rem, 6vw, 4rem);
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
 }
 .lesson table {
   border-collapse: collapse;

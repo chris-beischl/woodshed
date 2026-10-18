@@ -53,7 +53,7 @@ export function PianoKeyboard({ from = 48, to = 84 }: { from?: number; to?: numb
 
   return (
     <div className="select-none">
-      <div className="relative h-32 w-full overflow-hidden rounded-b-md border-t-4 border-signal/80 bg-ebony">
+      <div className="relative h-20 w-full overflow-hidden rounded-b-md border-t-4 border-signal/80 bg-ebony">
         {whites.map((m, i) => (
           <button
             key={m}

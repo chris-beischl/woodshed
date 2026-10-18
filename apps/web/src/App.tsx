@@ -98,7 +98,7 @@ export function App() {
         </Routes>
       </main>
       {/* Pinned so held keys stay visible while scrolling through a lesson. */}
-      <div className="-mx-4 shrink-0 bg-night/95 px-4 pt-3 pb-3 sm:-mx-8 sm:px-8">
+      <div className="-mx-4 shrink-0 bg-night/95 px-4 pt-2 pb-2 sm:-mx-8 sm:px-8">
         <PianoKeyboard />
       </div>
     </div>

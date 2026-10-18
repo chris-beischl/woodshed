@@ -38,16 +38,18 @@ export function SlideDeck({ slides }: { slides: Slide[] }) {
   const go = useCallback(
     (delta: number) => {
       const target = Math.max(0, Math.min(slides.length - 1, current + delta));
-      sections.current[target]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      // Next slide's heading lands exactly at the top. No CSS snapping: it overshoots tall slides.
+      const el = sections.current[target];
+      if (el && scroller.current) scroller.current.scrollTo({ top: el.offsetTop, behavior: "smooth" });
     },
     [current, slides.length],
   );
 
-  // The current slide is the last one whose top has passed 40% of the view (works for tall slides too).
+  // The current slide is the last one whose top has reached the top of the view.
   const onScroll = () => {
     const el = scroller.current;
     if (!el) return;
-    const line = el.scrollTop + el.clientHeight * 0.4;
+    const line = el.scrollTop + 8;
     let i = 0;
     sections.current.forEach((s, n) => {
       if (s && s.offsetTop <= line) i = n;
@@ -83,7 +85,7 @@ export function SlideDeck({ slides }: { slides: Slide[] }) {
 
   return (
     <div className="relative min-h-0 flex-1">
-      <div ref={scroller} onScroll={onScroll} className="relative h-full snap-y snap-mandatory overflow-y-auto">
+      <div ref={scroller} onScroll={onScroll} className="relative h-full overflow-y-auto">
         {slides.map((slide, i) => (
           <section
             key={i}
@@ -92,7 +94,7 @@ export function SlideDeck({ slides }: { slides: Slide[] }) {
             }}
             data-index={i}
             aria-current={i === current ? "step" : undefined}
-            className="flex min-h-full snap-start items-center py-10"
+            className="min-h-full pt-2 pb-16"
           >
             <div className="lesson slide mx-auto w-full max-w-3xl">
               <SlideContext.Provider value={{ active: i === current }}>{slide.content}</SlideContext.Provider>

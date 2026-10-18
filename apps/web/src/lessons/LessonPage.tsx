@@ -52,7 +52,7 @@ export function LessonPage() {
           <p className="condensed text-xl text-brass">
             <Link to="/kurs" className="hover:underline">{t.course.unit(lesson.unit)}</Link>
           </p>
-          <h1 className="display text-[clamp(3.5rem,9vw,6.5rem)]">{loc(lesson.title)}</h1>
+          <h1 className="display text-[clamp(2.6rem,6vw,4.5rem)]">{loc(lesson.title)}</h1>
           <p className="text-paper-dim">{t.course.minutes(lesson.estimatedMinutes)}</p>
           <p className="pt-6 text-lg">{t.lesson.howToNavigate}</p>
         </header>
