@@ -5,7 +5,7 @@ import { useCompleteLesson, useProgress } from "../progress/client";
 import { useManifest } from "../content/useManifest";
 import { loc } from "../ui/i18n";
 import { t } from "../ui/strings";
-import { Exercise, lessonComponents } from "./components";
+import { ChordDemo, CircleOfFifths, Exercise, lessonComponents } from "./components";
 import { lessonModule } from "./registry";
 import { SlideBreak, SlideDeck, splitSlides, type Slide } from "./SlideDeck";
 
@@ -23,7 +23,18 @@ function useLessonBody(id: string): MDXContent | null | undefined {
   return body?.id === id ? body.content : undefined;
 }
 
-const hasExercise = (nodes: ReactNode[]) => nodes.some((n) => isValidElement(n) && n.type === Exercise);
+/** Things to play or hear; they move beside the text in landscape. */
+const APPLICATIONS: unknown[] = [Exercise, ChordDemo, CircleOfFifths];
+const isApplication = (n: ReactNode) => isValidElement(n) && APPLICATIONS.includes(n.type);
+
+function bodySlide(nodes: ReactNode[]): Slide {
+  const aside = nodes.filter(isApplication);
+  return {
+    content: nodes.filter((n) => !isApplication(n)),
+    aside: aside.length > 0 ? aside : undefined,
+    hasExercise: nodes.some((n) => isValidElement(n) && n.type === Exercise),
+  };
+}
 
 export function LessonPage() {
   const { id = "" } = useParams();
@@ -58,7 +69,7 @@ export function LessonPage() {
         </header>
       ),
     },
-    ...bodySlides.map((nodes) => ({ content: nodes, hasExercise: hasExercise(nodes) })),
+    ...bodySlides.map(bodySlide),
     {
       hasExercise: false,
       content: (

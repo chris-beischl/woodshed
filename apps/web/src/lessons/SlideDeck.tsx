@@ -24,6 +24,8 @@ const PEDAL_COOLDOWN_MS = 400;
 
 export interface Slide {
   content: ReactNode;
+  /** The slide's application (exercise, demo): below the text upright, beside it in landscape. */
+  aside?: ReactNode;
   /** The pedal belongs to the exercise on this slide while "Pedal = next" is on. */
   hasExercise: boolean;
 }
@@ -96,9 +98,16 @@ export function SlideDeck({ slides }: { slides: Slide[] }) {
             aria-current={i === current ? "step" : undefined}
             className="min-h-full pt-2 pb-16"
           >
-            <div className="lesson slide mx-auto w-full max-w-3xl">
-              <SlideContext.Provider value={{ active: i === current }}>{slide.content}</SlideContext.Provider>
-            </div>
+            <SlideContext.Provider value={{ active: i === current }}>
+              {slide.aside ? (
+                <div className="mx-auto grid w-full max-w-3xl gap-8 md:landscape:max-w-6xl md:landscape:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:landscape:items-start">
+                  <div className="lesson slide">{slide.content}</div>
+                  <div className="space-y-6 [&>*]:my-0!">{slide.aside}</div>
+                </div>
+              ) : (
+                <div className="lesson slide mx-auto w-full max-w-3xl">{slide.content}</div>
+              )}
+            </SlideContext.Provider>
           </section>
         ))}
       </div>
