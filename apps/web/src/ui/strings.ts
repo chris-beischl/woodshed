@@ -4,9 +4,18 @@ import { lang } from "./i18n";
 /** All UI text in one place. German is the reference; jazz terms stay English. */
 const de = {
   appName: "woodshed",
-  nav: { practice: "Üben", course: "Kurs", free: "Freie Übungen", settings: "Einstellungen", dev: "Entwicklung" },
+  nav: { practice: "Üben", course: "Kurs", free: "Freie Übungen", workout: "Tonart-Training", settings: "Einstellungen", dev: "Entwicklung" },
   language: "Sprache",
   keyName: (note: string, mode: "major" | "minor") => `${note}-${mode === "minor" ? "Moll" : "Dur"}`,
+  workout: {
+    title: "Tonart-Training",
+    intro: "Eine Tonart, viele Blickwinkel: erst im Kopf (Stufen), dann in den Fingern (Tonleitern), dann Akkorde und Progressionen. So wie im echten Spiel, wo du in einer Tonart bist und schnell handeln musst. Würfle eine Tonart oder wähle gezielt eine.",
+    random: "Zufällige Tonart",
+    step: (i: number, n: number) => `Übung ${i} von ${n}`,
+    otherKey: "Andere Tonart",
+    done: (key: string) => `${key} sitzt.`,
+    summary: (clean: number, total: number) => `${clean} von ${total} Übungen auf Anhieb fehlerfrei. Weiter mit der nächsten Tonart:`,
+  },
   free: {
     title: "Freie Übungen",
     intro: "Alles üben, jederzeit – ohne Lektion und ohne Übungsplan. Freie Runden ändern deine Wiederholungen nicht.",
@@ -161,9 +170,18 @@ const de = {
 
 const en: typeof de = {
   appName: "woodshed",
-  nav: { practice: "Practice", course: "Course", free: "Free practice", settings: "Settings", dev: "Developer" },
+  nav: { practice: "Practice", course: "Course", free: "Free practice", workout: "Key workout", settings: "Settings", dev: "Developer" },
   language: "Language",
   keyName: (note: string, mode: "major" | "minor") => `${note} ${mode === "minor" ? "minor" : "major"}`,
+  workout: {
+    title: "Key workout",
+    intro: "One key, many angles: first in your head (degrees), then in your fingers (scales), then chords and progressions. Just like real playing, where you are in a key and have to act fast. Roll a random key or pick one on purpose.",
+    random: "Random key",
+    step: (i: number, n: number) => `Exercise ${i} of ${n}`,
+    otherKey: "Other key",
+    done: (key: string) => `${key}: done.`,
+    summary: (clean: number, total: number) => `${clean} of ${total} exercises clean first time. On to the next key:`,
+  },
   free: {
     title: "Free practice",
     intro: "Practice anything, any time – no lesson, no plan. Free rounds don't change your reviews.",

@@ -4,6 +4,7 @@ import { CoursePage } from "./lessons/CoursePage";
 import { LessonPage } from "./lessons/LessonPage";
 import { DevPage } from "./practice/DevPage";
 import { FreeExercisePage, FreePage } from "./practice/FreePage";
+import { KeyWorkoutPage } from "./practice/KeyWorkoutPage";
 import { PracticePage } from "./practice/PracticePage";
 import { SettingsPage } from "./practice/SettingsPage";
 import { PianoKeyboard } from "./ui/PianoKeyboard";
@@ -64,6 +65,7 @@ export function App() {
           <NavLink to="/" end className={link}>{t.nav.practice}</NavLink>
           <NavLink to="/kurs" className={link}>{t.nav.course}</NavLink>
           <NavLink to="/frei" className={link}>{t.nav.free}</NavLink>
+          <NavLink to="/tonart" className={link}>{t.nav.workout}</NavLink>
           <NavLink to="/einstellungen" className={link}>{t.nav.settings}</NavLink>
           <NavLink to="/dev" className={link}>{t.nav.dev}</NavLink>
         </nav>
@@ -92,6 +94,7 @@ export function App() {
           <Route path="/kurs" element={<CoursePage />} />
           <Route path="/lektion/:id" element={<LessonPage />} />
           <Route path="/frei" element={<FreePage />} />
+          <Route path="/tonart" element={<KeyWorkoutPage />} />
           <Route path="/frei/:id" element={<FreeExercisePage />} />
           <Route path="/einstellungen" element={<SettingsPage />} />
           <Route path="/dev" element={<DevPage />} />
